@@ -1,24 +1,23 @@
 package ships.model;
 
-public class Map {
+/**
+ * @author Mateusz Kozlowski
+ */
+interface Map
+{
+    /**
+     * Places ship at given position
+     * @param startField indicates position at which the ship is to be placed
+     * @param direction <b>true</b> if vertical, <b>false</b> otherwise
+     * @param shipSize size of the ship
+     * @return <b>true</b> if ship placement was possible, <b>false</b> otherwise
+     */
+    Boolean placeShip(FieldImpl startField, Boolean direction, ShipImpl.Size shipSize);
 
-    private static final int mapSize = 10;
-    public static final int EMPTY = 0;
-    public static final int SHIP = 1;
-    public static final int FORBIDDEN = 2;
-    public static final int CHECKED = 4;
-    private Field[][] map;
-
-    public Map() {
-        map = new Field[mapSize][mapSize];
-    }
-
-    public Field[][] getPlayersMap() {
-        return null;
-    }
-
-    public Field[][] getOpponentsMap() {
-        return null;
-    }
-
+    /**
+     * Performs a shoot at position given
+     * @param position position to shoot at
+     * @return <b>true</b> if hit, <b>false</b> otherwise
+     */
+    Boolean shootAt(FieldImpl position);
 }
