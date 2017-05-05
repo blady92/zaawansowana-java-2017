@@ -1,17 +1,17 @@
 package ships.model;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import static junitparams.JUnitParamsRunner.$;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GameMapTest {
     private GameMap objectUnderTest;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         objectUnderTest = new GameMap();
     }
 
