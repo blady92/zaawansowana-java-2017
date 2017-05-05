@@ -1,6 +1,8 @@
 package ships.model;
 
-import ships.exception.ShipPlacementNotPossibleException;
+import ships.exception.CollidesWithAnotherShipException;
+import ships.exception.NoShipsAvailableException;
+import ships.exception.OutsideOfMapPlacementException;
 
 /**
  * @author Mateusz Kozlowski
@@ -9,13 +11,12 @@ interface Map
 {
     /**
      * Places ship at given position
-     * @param startField indicates position at which the ship is to be placed
-     * @param direction <b>true</b> if vertical, <b>false</b> otherwise
-     * @param shipSize size of the ship
-     * @throws ShipPlacementNotPossibleException when
-     * position you want to take is already occupied
+     * @param ship
+     * @throws CollidesWithAnotherShipException
+     * @throws NoShipsAvailableException
+     * @throws OutsideOfMapPlacementException
      */
-    void placeShip(Field startField, Boolean direction, ShipImpl.Size shipSize) throws ShipPlacementNotPossibleException;
+    void placeShip(Ship ship) throws CollidesWithAnotherShipException, NoShipsAvailableException, OutsideOfMapPlacementException;
 
     /**
      * Performs a shoot at position given
@@ -23,4 +24,19 @@ interface Map
      * @return <b>true</b> if hit, <b>false</b> otherwise
      */
     Boolean shootAt(Field position);
+
+    /**
+     * Gets number of ships of size given user can still place on map
+     * @param size
+     * @return
+     */
+    Integer getAvailableShipCount(Ship.Size size);
+
+    /**
+     * Gets field data at position given
+     * @param row
+     * @param col
+     * @return
+     */
+    Field getField(Integer row, Integer col);
 }
