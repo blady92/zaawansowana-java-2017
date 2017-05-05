@@ -1,24 +1,26 @@
 package ships.model;
 
-public class Map {
+import ships.exception.ShipPlacementNotPossibleException;
 
-    private static final int mapSize = 10;
-    public static final int EMPTY = 0;
-    public static final int SHIP = 1;
-    public static final int FORBIDDEN = 2;
-    public static final int CHECKED = 4;
-    private Field[][] map;
+/**
+ * @author Mateusz Kozlowski
+ */
+interface Map
+{
+    /**
+     * Places ship at given position
+     * @param startField indicates position at which the ship is to be placed
+     * @param direction <b>true</b> if vertical, <b>false</b> otherwise
+     * @param shipSize size of the ship
+     * @throws ShipPlacementNotPossibleException when
+     * position you want to take is already occupied
+     */
+    void placeShip(Field startField, Boolean direction, ShipImpl.Size shipSize) throws ShipPlacementNotPossibleException;
 
-    public Map() {
-        map = new Field[mapSize][mapSize];
-    }
-
-    public Field[][] getPlayersMap() {
-        return null;
-    }
-
-    public Field[][] getOpponentsMap() {
-        return null;
-    }
-
+    /**
+     * Performs a shoot at position given
+     * @param position position to shoot at
+     * @return <b>true</b> if hit, <b>false</b> otherwise
+     */
+    Boolean shootAt(Field position);
 }

@@ -1,19 +1,19 @@
 package ships.model;
 
-public class Field {
+/**
+ * @author Mateusz Kozlowski
+ */
+public interface Field
+{
+    /**
+     * Informs if field is occuped by a ship
+     * @return
+     */
+    Boolean isShipHere();
 
-    private Boolean business, attacked;
-
-    public Field(Boolean busy) {
-        this.business = busy;
-    }
-
-    public Boolean isShipHere() {
-        return business;
-    }
-
-    public Boolean isAttacked() {
-        return attacked;
-    }
-
+    /**
+     * Informs if field had been already shot by opponent
+     * @return <b>true</b> if field had been attacked
+     */
+    Boolean isAttacked();
 }

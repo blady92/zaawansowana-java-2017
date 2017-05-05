@@ -1,5 +1,6 @@
 *.class
-
+.idea
+zaawansowana-java-2017.iml
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
