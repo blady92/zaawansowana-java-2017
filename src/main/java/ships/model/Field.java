@@ -5,6 +5,10 @@ package ships.model;
  */
 public interface Field
 {
+    enum State {
+        EMPTY, SHIP, FORBIDDEN
+    }
+
     /**
      * Informs if field is occuped by a ship
      * @return
@@ -16,4 +20,14 @@ public interface Field
      * @return <b>true</b> if field had been attacked
      */
     Boolean isAttacked();
+
+    int getRow();
+
+    int getCol();
+
+    void setState(State state);
+
+    State getState();
+
+    void attack();
 }
