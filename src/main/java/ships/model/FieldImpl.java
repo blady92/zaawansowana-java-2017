@@ -62,8 +62,18 @@ public class FieldImpl implements Field {
         return state;
     }
 
-    public void attack() {
-        this.attacked = true;
+    public Boolean attack() {
+        if (state == State.SHIP) {
+            this.attacked = true;
+            return Boolean.TRUE;
+        } else {
+            return Boolean.FALSE;
+        }
+    }
+
+    @Override
+    public boolean samePosition(Field f) {
+        return this.getRow() == f.getRow() && this.getCol() == f.getCol();
     }
 
     @Override

@@ -118,9 +118,26 @@ public class GameMap implements Map {
      *
      * @param position position to shoot at
      * @return <b>true</b> if hit, <b>false</b> otherwise
+     * @throws ships.exception.OutsideOfMapPlacementException
      */
-    public Boolean shootAt(Field position) {
-        throw new RuntimeException("Not implemented");
+    public Boolean shootAt(Field position) throws OutsideOfMapPlacementException {
+        Field fieldToShoot = null;
+        //HACK: should be separate method with Field param
+        if (!checkShipValidity(new Ship(Ship.Size.ONE, position, Ship.Direction.VERTICAL))) {
+            throw new OutsideOfMapPlacementException();
+        }
+        for(Field[] fv : map) {
+            for(Field f : fv) {
+                if(f.samePosition(position)) {
+                    fieldToShoot = f;
+                    break;
+                }
+            }
+        }
+        if(fieldToShoot == null) {
+            throw new RuntimeException("Position ["+position.getRow()+","+position.getCol()+"] not found!");
+        }
+        return fieldToShoot.attack();
     }
 
     /**
