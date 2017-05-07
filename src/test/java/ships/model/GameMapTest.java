@@ -132,4 +132,15 @@ public class GameMapTest {
             assertEquals(ex.getCollisions(), expected);
         }
     }
+
+    @Test
+    public void shouldGetShipAtPosition() throws ShipGameException {
+        //given
+        Ship ship = new Ship(Ship.Size.FOUR, new FieldImpl(0, 0), Ship.Direction.HORIZONTAL);
+        objectUnderTest.placeShip(ship);
+        //when
+        Ship actual = objectUnderTest.getShipAtPosition(new FieldImpl(0, 3));
+        //then
+        assertSame(ship, actual);
+    }
 }
