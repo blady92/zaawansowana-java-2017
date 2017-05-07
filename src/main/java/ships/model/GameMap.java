@@ -205,8 +205,26 @@ public class GameMap implements Map {
         }
     }
 
-    private Ship getShipAtPosition(Field position) {
-        throw new RuntimeException("Not implemented");
+    public Ship getShipAtPosition(Field position)
+            throws ShipNotFoundException {
+        for (Ship s : ships) {
+            Integer rs = s.getPosition().getRow();
+            Integer re = s.getPosition().getRow();
+            Integer cs = s.getPosition().getCol();
+            Integer ce = s.getPosition().getCol();
+            if (s.getDirection() == Ship.Direction.VERTICAL) {
+                re += s.getSize().getSize();
+            } else {
+                ce += s.getSize().getSize();
+            }
+            if (position.getRow() >= rs
+                    && position.getRow() <= re
+                    && position.getCol() >= cs
+                    && position.getCol() <= ce) {
+                return s;
+            }
+        }
+        throw new ShipNotFoundException();
     }
 
     private static class Bounds {
