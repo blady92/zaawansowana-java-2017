@@ -25,8 +25,6 @@ public class GameMapTest {
     }
 
     @Test
-    @Ignore
-    //TODO: investigate
     public void shouldPlaceShipVerticallyOnMap() throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
@@ -61,8 +59,6 @@ public class GameMapTest {
     }
 
     @Test
-    @Ignore
-    //TODO: investigate
     public void shouldPlaceShipHorizontallyOnMap() throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
