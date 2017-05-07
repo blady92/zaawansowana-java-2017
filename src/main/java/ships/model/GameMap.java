@@ -7,6 +7,7 @@ import ships.exception.OutsideOfMapPlacementException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import ships.exception.ShipNotFoundException;
 
 /**
  * @author Mateusz Kozlowski
@@ -44,13 +45,41 @@ public class GameMap implements Map {
      */
     public void placeShip(Ship ship)
             throws CollidesWithAnotherShipException, NoShipsAvailableException, OutsideOfMapPlacementException {
+        if (!checkShipValidity(ship)) {
+            throw new OutsideOfMapPlacementException();
+        }
         decrementAvailabelShipCount(ship.getSize());
-        //TODO: use ships list
+        ships.add(ship);
         List<Field> fields = isAbleToPlaceShip(ship);
         if (!fields.isEmpty()) {
             throw new CollidesWithAnotherShipException(fields);
         }
         markPositionOnMap(ship);
+    }
+
+    /**
+     * Check if ship position is within the map
+     *
+     * @param ship
+     * @return
+     */
+    private Boolean checkShipValidity(Ship ship) {
+        Integer r = ship.getPosition().getRow();
+        Integer c = ship.getPosition().getCol();
+        Integer end = ship.getSize().getSize() - 1;
+        if (ship.getDirection() == Ship.Direction.VERTICAL) {
+            end += r;
+        } else {
+            end += c;
+        }
+        if (r < 0
+                || r >= mapSize
+                || c < 0
+                || c >= mapSize
+                || end >= mapSize) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -184,29 +213,19 @@ public class GameMap implements Map {
 
         int firstForbiddenAcross, lastForbiddenAcross, firstForbiddenAlong, lastForbiddenAlong;
 
-        public Bounds(Ship ship) throws OutsideOfMapPlacementException {
+        public Bounds(Ship ship) {
 
             int r = ship.getPosition().getRow();
             int c = ship.getPosition().getCol();
             Integer length = ship.getSize().getSize();
 
-            if (c < 0 || r < 0) {
-                throw new OutsideOfMapPlacementException();
-            }
-
             if (ship.getDirection() == Ship.Direction.VERTICAL) {
-                if (r + length > mapSize - 1) {
-                    throw new OutsideOfMapPlacementException();
-                }
                 //mark adjacent positions as forbidden
                 firstForbiddenAcross = r - 1;
                 lastForbiddenAcross = r + length;
                 firstForbiddenAlong = c - 1;
                 lastForbiddenAlong = c + 1;
             } else {
-                if (c + length > mapSize - 1) {
-                    throw new OutsideOfMapPlacementException();
-                }
                 //mark adjacent positions as forbidden
                 firstForbiddenAcross = c - 1;
                 lastForbiddenAcross = c + length;
