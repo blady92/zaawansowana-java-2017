@@ -7,10 +7,11 @@ import ships.exception.OutsideOfMapPlacementException;
 /**
  * @author Mateusz Kozlowski
  */
-interface Map
-{
+interface Map {
+
     /**
      * Places ship at given position
+     *
      * @param ship
      * @throws CollidesWithAnotherShipException
      * @throws NoShipsAvailableException
@@ -20,6 +21,7 @@ interface Map
 
     /**
      * Performs a shoot at position given
+     *
      * @param position position to shoot at
      * @return <b>true</b> if hit, <b>false</b> otherwise
      */
@@ -27,6 +29,7 @@ interface Map
 
     /**
      * Gets number of ships of size given user can still place on map
+     *
      * @param size
      * @return
      */
@@ -34,6 +37,7 @@ interface Map
 
     /**
      * Gets field data at position given
+     *
      * @param row
      * @param col
      * @return

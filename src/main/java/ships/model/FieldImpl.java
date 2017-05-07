@@ -9,7 +9,7 @@ public class FieldImpl implements Field {
 
     private Boolean attacked;
     private State state;
-    private int row,col;
+    private int row, col;
 
     public FieldImpl(State state, int row, int col) {
         this.state = state;
@@ -47,13 +47,17 @@ public class FieldImpl implements Field {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         FieldImpl field = (FieldImpl) o;
-        return row == field.row &&
-                col == field.col &&
-                Objects.equals(attacked, field.attacked) &&
-                state == field.state;
+        return row == field.row
+                && col == field.col
+                && Objects.equals(attacked, field.attacked)
+                && state == field.state;
     }
 
     @Override

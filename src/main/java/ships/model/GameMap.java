@@ -12,6 +12,7 @@ import java.util.List;
  * @author Mateusz Kozlowski
  */
 public class GameMap implements Map {
+
     private static final int mapSize = 10;
     private Field[][] map;
     private List<Ship> ships;
@@ -83,7 +84,6 @@ public class GameMap implements Map {
         return conflicts;
     }
 
-
     /**
      * Performs a shoot at position given
      *
@@ -110,12 +110,12 @@ public class GameMap implements Map {
 
     private void decrementAvailabelShipCount(Ship.Size size) throws NoShipsAvailableException {
         Integer count = availableShips.get(size);
-        if (count < 1)
+        if (count < 1) {
             throw new NoShipsAvailableException();
+        }
         count--;
         availableShips.put(size, count);
     }
-
 
     /**
      * Gets field data at position given
@@ -136,7 +136,6 @@ public class GameMap implements Map {
     public Integer getScore() {
         throw new RuntimeException("Not implemented");
     }
-
 
     private void markPositionOnMap(Ship ship)
             throws OutsideOfMapPlacementException {
@@ -191,8 +190,9 @@ public class GameMap implements Map {
             int c = ship.getPosition().getCol();
             Integer length = ship.getSize().getSize();
 
-            if (c < 0 || r < 0)
+            if (c < 0 || r < 0) {
                 throw new OutsideOfMapPlacementException();
+            }
 
             if (ship.getDirection() == Ship.Direction.VERTICAL) {
                 if (r + length > mapSize - 1) {

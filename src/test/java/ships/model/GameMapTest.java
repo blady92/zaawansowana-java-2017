@@ -16,6 +16,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class GameMapTest {
+
     private GameMap objectUnderTest;
 
     @Before
@@ -35,25 +36,25 @@ public class GameMapTest {
         //when
         objectUnderTest.placeShip(ship);
         Object[] fields = $(
-                $(objectUnderTest.getField(0, 0),Field.State.SHIP),
-                $(objectUnderTest.getField(0, 1),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(0, 2),Field.State.EMPTY),
-                $(objectUnderTest.getField(1, 0),Field.State.SHIP),
-                $(objectUnderTest.getField(1, 1),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(1, 2),Field.State.EMPTY),
-                $(objectUnderTest.getField(2, 0),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(2, 1),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(2, 2),Field.State.EMPTY)
+                $(objectUnderTest.getField(0, 0), Field.State.SHIP),
+                $(objectUnderTest.getField(0, 1), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(0, 2), Field.State.EMPTY),
+                $(objectUnderTest.getField(1, 0), Field.State.SHIP),
+                $(objectUnderTest.getField(1, 1), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(1, 2), Field.State.EMPTY),
+                $(objectUnderTest.getField(2, 0), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(2, 1), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(2, 2), Field.State.EMPTY)
         );
         //then
-        assertEquals((Integer)2, objectUnderTest.getAvailableShipCount(Ship.Size.TWO));
+        assertEquals((Integer) 2, objectUnderTest.getAvailableShipCount(Ship.Size.TWO));
         for (Object field : fields) {
             Object[] set = (Object[]) field;
             Field f = (Field) set[0];
             Field.State s = (Field.State) set[1];
             assertTrue(
-                    "Field ["+f.getRow()+","+f.getCol()+"] was expected to be "+
-                            s.toString()+", but is "+f.getState().toString(),
+                    "Field [" + f.getRow() + "," + f.getCol() + "] was expected to be "
+                    + s.toString() + ", but is " + f.getState().toString(),
                     f.getState() == s);
         }
         assertEquals(expecteds, objectUnderTest.getShips());
@@ -71,24 +72,24 @@ public class GameMapTest {
         //when
         objectUnderTest.placeShip(ship);
         Object[] fields = $(
-                $(objectUnderTest.getField(0, 0),Field.State.SHIP),
-                $(objectUnderTest.getField(0, 1),Field.State.SHIP),
-                $(objectUnderTest.getField(0, 2),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(0, 3),Field.State.EMPTY),
-                $(objectUnderTest.getField(1, 0),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(1, 1),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(1, 2),Field.State.FORBIDDEN),
-                $(objectUnderTest.getField(1, 3),Field.State.EMPTY)
+                $(objectUnderTest.getField(0, 0), Field.State.SHIP),
+                $(objectUnderTest.getField(0, 1), Field.State.SHIP),
+                $(objectUnderTest.getField(0, 2), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(0, 3), Field.State.EMPTY),
+                $(objectUnderTest.getField(1, 0), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(1, 1), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(1, 2), Field.State.FORBIDDEN),
+                $(objectUnderTest.getField(1, 3), Field.State.EMPTY)
         );
         //then
-        assertEquals((Integer)2, objectUnderTest.getAvailableShipCount(Ship.Size.TWO));
+        assertEquals((Integer) 2, objectUnderTest.getAvailableShipCount(Ship.Size.TWO));
         for (Object field : fields) {
             Object[] set = (Object[]) field;
             Field f = (Field) set[0];
             Field.State s = (Field.State) set[1];
             assertTrue(
-                    "Field ["+f.getRow()+","+f.getCol()+"] was expected to be "+
-                            s.toString()+", but is "+f.getState().toString(),
+                    "Field [" + f.getRow() + "," + f.getCol() + "] was expected to be "
+                    + s.toString() + ", but is " + f.getState().toString(),
                     f.getState() == s);
         }
         assertEquals(expecteds, objectUnderTest.getShips());
@@ -126,8 +127,7 @@ public class GameMapTest {
         try {
             objectUnderTest.placeShip(ship2);
             fail("CollidesWithAnotherShipException expected");
-        }
-        catch(CollidesWithAnotherShipException ex) {
+        } catch (CollidesWithAnotherShipException ex) {
             //then
             assertEquals(ex.getCollisions(), expected);
         }
