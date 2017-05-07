@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ships.exception;
 
 import ships.model.Field;
@@ -10,7 +5,7 @@ import ships.model.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollidesWithAnotherShipException extends Exception {
+public class CollidesWithAnotherShipException extends ShipGameException {
 
     private List<Field> collisions = null;
 

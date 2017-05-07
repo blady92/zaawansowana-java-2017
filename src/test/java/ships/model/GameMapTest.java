@@ -4,16 +4,16 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import ships.exception.CollidesWithAnotherShipException;
-import ships.exception.NoShipsAvailableException;
-import ships.exception.OutsideOfMapPlacementException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static junitparams.JUnitParamsRunner.$;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import ships.exception.ShipGameException;
 
 public class GameMapTest {
 
@@ -27,7 +27,7 @@ public class GameMapTest {
     @Test
     @Ignore
     //TODO: investigate
-    public void shouldPlaceShipVerticallyOnMap() throws CollidesWithAnotherShipException, NoShipsAvailableException, OutsideOfMapPlacementException {
+    public void shouldPlaceShipVerticallyOnMap() throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
         Ship ship = new Ship(Ship.Size.TWO, startF, Ship.Direction.VERTICAL);
@@ -63,7 +63,7 @@ public class GameMapTest {
     @Test
     @Ignore
     //TODO: investigate
-    public void shouldPlaceShipHorizontallyOnMap() throws CollidesWithAnotherShipException, NoShipsAvailableException, OutsideOfMapPlacementException {
+    public void shouldPlaceShipHorizontallyOnMap() throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
         Ship ship = new Ship(Ship.Size.TWO, startF, Ship.Direction.HORIZONTAL);
@@ -97,7 +97,7 @@ public class GameMapTest {
 
     @Test
     public void shouldReturnListOfConflictingFieldsWhenPlacingSecondShipOnSamePlace()
-            throws CollidesWithAnotherShipException, NoShipsAvailableException, OutsideOfMapPlacementException {
+            throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
         Ship ship1 = new Ship(Ship.Size.TWO, startF, Ship.Direction.VERTICAL);
@@ -114,7 +114,7 @@ public class GameMapTest {
 
     @Test
     public void shouldRefuseToPlaceSecondShipOnSamePlace()
-            throws CollidesWithAnotherShipException, NoShipsAvailableException, OutsideOfMapPlacementException {
+            throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
         Ship ship1 = new Ship(Ship.Size.TWO, startF, Ship.Direction.VERTICAL);
