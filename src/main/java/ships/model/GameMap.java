@@ -163,11 +163,30 @@ public class GameMap implements Map {
      * @return
      */
     public Integer getScore() {
-        throw new RuntimeException("Not implemented");
+        if (!isDeploymentFinished()) {
+            return 0;
+        }
+        Integer score = 0;
+        for (Field[] fa : map) {
+            for (Field f : fa) {
+                if (f.isShipHere() && !f.isAttacked()) {
+                    score++;
+                }
+            }
+        }
+        return score;
     }
 
-    private void markPositionOnMap(Ship ship)
-            throws OutsideOfMapPlacementException {
+    public Boolean isDeploymentFinished() {
+        for (Object v : availableShips.values()) {
+            if ((Integer) v != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void markPositionOnMap(Ship ship) {
         Bounds bounds = new Bounds(ship);
 
         markForbiddenAreaOnMap(bounds, ship);
