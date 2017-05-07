@@ -15,6 +15,14 @@ public class FieldImpl implements Field {
         this.state = state;
         this.row = row;
         this.col = col;
+        this.attacked = Boolean.FALSE;
+    }
+
+    public FieldImpl(int row, int col) {
+        this.state = State.EMPTY;
+        this.row = row;
+        this.col = col;
+        this.attacked = Boolean.FALSE;
     }
 
     public int getRow() {
@@ -25,14 +33,27 @@ public class FieldImpl implements Field {
         return col;
     }
 
+    /**
+     * Informs if field is occuped by a ship
+     *
+     * @return
+     */
     public Boolean isShipHere() {
         return state == State.SHIP;
     }
 
+    /**
+     * Informs if field had been already shot by opponent
+     *
+     * @return <b>true</b> if field had been attacked
+     */
     public Boolean isAttacked() {
         return attacked;
     }
 
+    /**
+     * @param state the state to set
+     */
     public void setState(State state) {
         this.state = state;
     }
