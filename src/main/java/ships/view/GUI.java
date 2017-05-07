@@ -5,6 +5,14 @@
  */
 package ships.view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.LayoutManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import ships.exception.OutsideOfMapPlacementException;
+
 /**
  *
  * @author r4pt0r
@@ -16,11 +24,19 @@ public class GUI extends javax.swing.JFrame {
      */
     public GUI() {
         initComponents();
-        
-        //create GameArea instance filling whole panel
-        GameArea ga = new GameArea();
-        ga.setBounds(0, 0, gameAreaPanel.getWidth(), gameAreaPanel.getHeight());
-        gameAreaPanel.add(ga);
+
+        //create BattleshipsMap instance filling whole panel
+        BattleshipsMap player = new BattleshipsMap();
+        player.setBounds(0, 0, thisPlayerMap.getWidth(), thisPlayerMap.getHeight());
+        thisPlayerMap.add(player, BorderLayout.WEST);
+        BattleshipsMap opponent = new BattleshipsMap();
+        opponent.setBounds(0, 0, anotherPlayerMap.getWidth(), anotherPlayerMap.getHeight());
+        anotherPlayerMap.add(opponent, BorderLayout.WEST);
+        try {
+            player.fillField(1, 2, Color.yellow);
+        } catch (OutsideOfMapPlacementException ex) {
+            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -32,19 +48,31 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        gameAreaPanel = new javax.swing.JPanel();
+        thisPlayerMap = new java.awt.Panel();
+        anotherPlayerMap = new java.awt.Panel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        javax.swing.GroupLayout gameAreaPanelLayout = new javax.swing.GroupLayout(gameAreaPanel);
-        gameAreaPanel.setLayout(gameAreaPanelLayout);
-        gameAreaPanelLayout.setHorizontalGroup(
-            gameAreaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 376, Short.MAX_VALUE)
+        javax.swing.GroupLayout thisPlayerMapLayout = new javax.swing.GroupLayout(thisPlayerMap);
+        thisPlayerMap.setLayout(thisPlayerMapLayout);
+        thisPlayerMapLayout.setHorizontalGroup(
+            thisPlayerMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 280, Short.MAX_VALUE)
         );
-        gameAreaPanelLayout.setVerticalGroup(
-            gameAreaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 276, Short.MAX_VALUE)
+        thisPlayerMapLayout.setVerticalGroup(
+            thisPlayerMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout anotherPlayerMapLayout = new javax.swing.GroupLayout(anotherPlayerMap);
+        anotherPlayerMap.setLayout(anotherPlayerMapLayout);
+        anotherPlayerMapLayout.setHorizontalGroup(
+            anotherPlayerMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 280, Short.MAX_VALUE)
+        );
+        anotherPlayerMapLayout.setVerticalGroup(
+            anotherPlayerMapLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 280, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -53,15 +81,19 @@ public class GUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(gameAreaPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(thisPlayerMap, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(anotherPlayerMap, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(124, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(gameAreaPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(anotherPlayerMap, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(thisPlayerMap, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(125, Short.MAX_VALUE))
         );
 
         pack();
@@ -103,6 +135,7 @@ public class GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel gameAreaPanel;
+    private java.awt.Panel anotherPlayerMap;
+    private java.awt.Panel thisPlayerMap;
     // End of variables declaration//GEN-END:variables
 }
