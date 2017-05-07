@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CollidesWithAnotherShipException extends Exception {
-    
+
     private List<Field> collisions = null;
 
     public List<Field> getCollisions() {
@@ -38,13 +38,11 @@ public class CollidesWithAnotherShipException extends Exception {
 
     /**
      * Constructs an instance of <code>ShipPlacementNotPossible</code> with the
- specified detail message and collisions.
+     * specified detail message and collisions.
      *
-     * @param msg the detail message.
      * @param collisions
      */
-    public CollidesWithAnotherShipException(String msg, List<Field> collisions) {
-        super(msg);
+    public CollidesWithAnotherShipException(List<Field> collisions) {
         this.collisions = collisions;
     }
 }

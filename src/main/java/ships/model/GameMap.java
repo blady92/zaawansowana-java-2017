@@ -28,70 +28,211 @@ public class GameMap implements Map {
         ships = new ArrayList<>();
         for (int i = 0; i < mapSize; i++) {
             for (int j = 0; j < mapSize; j++) {
-                map[i][j] = new FieldImpl(FieldImpl.State.EMPTY, i, j);
+                map[i][j] = new FieldImpl(Field.State.EMPTY, i, j);
             }
         }
     }
 
+    /**
+     * Places ship at given position
+     *
+     * @param ship
+     * @throws CollidesWithAnotherShipException
+     * @throws NoShipsAvailableException
+     * @throws OutsideOfMapPlacementException
+     */
     public void placeShip(Ship ship)
             throws CollidesWithAnotherShipException, NoShipsAvailableException, OutsideOfMapPlacementException {
-        int available = availableShips.get(ship.getSize());
-        if (available <= 0) {
-            throw new NoShipsAvailableException();
+        decrementAvailabelShipCount(ship.getSize());
+        //TODO: use ships list
+        List<Field> fields = isAbleToPlaceShip(ship);
+        if (!fields.isEmpty()) {
+            throw new CollidesWithAnotherShipException(fields);
         }
-        availableShips.replace(ship.getSize(), available - 1);
+        markPositionOnMap(ship);
+    }
+
+    /**
+     * Checks if it is possible to place ship at given position
+     *
+     * @param ship
+     * @return conflicted field location array
+     */
+    public List<Field> isAbleToPlaceShip(Ship ship) {
+
+        List<Field> conflicts = new ArrayList<>();
         int r = ship.getPosition().getRow();
         int c = ship.getPosition().getCol();
-        Integer length = ship.getSizeAsInteger();
-        if (c < 0 || r < 0)
-            throw new OutsideOfMapPlacementException();
-        if (ship.getDirection()) {
-            //vertical
-            if (r + length > mapSize - 1) {
-                throw new OutsideOfMapPlacementException();
-            }
-            //mark adjacent positions as forbidden
-            int firstForbiddenRow = r - 1;
-            int lastForbiddenRow = r + length;
-            int firstForbiddenCol = c - 1;
-            int lastForbiddenCol = c + 1;
-            //if sth is outside of map, fix
-            if (firstForbiddenRow < 0) {
-                firstForbiddenRow = 0;
-            }
-            if (firstForbiddenCol < 0) {
-                firstForbiddenCol = 0;
-            }
-            if (lastForbiddenRow > mapSize - 1) {
-                lastForbiddenRow = mapSize - 1;
-            }
-            if (lastForbiddenCol > mapSize - 1) {
-                lastForbiddenCol = mapSize - 1;
-            }
-            for (int row = firstForbiddenRow; row <= lastForbiddenRow; row++) {
-                for (int col = firstForbiddenCol; col <= lastForbiddenCol; col++) {
-                    map[row][col].setState(Field.State.FORBIDDEN);
+        Integer length = ship.getSize().getSize();
+
+        if (ship.getDirection() == Ship.Direction.VERTICAL) {
+            Integer col = ship.getPosition().getCol();
+            for (int row = r; row < r + length; row++) {
+                if (map[row][col].getState() != Field.State.EMPTY) {
+                    conflicts.add(map[row][col]);
                 }
             }
+        } else {
+            Integer row = ship.getPosition().getRow();
+            for (int col = c; col < c + length; col++) {
+                if (map[row][col].getState() != Field.State.EMPTY) {
+                    conflicts.add(map[row][col]);
+                }
+            }
+        }
+        return conflicts;
+    }
+
+
+    /**
+     * Performs a shoot at position given
+     *
+     * @param position position to shoot at
+     * @return <b>true</b> if hit, <b>false</b> otherwise
+     */
+    public Boolean shootAt(Field position) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * Gets number of ships of size given user can still place on map
+     *
+     * @param size
+     * @return
+     */
+    public Integer getAvailableShipCount(Ship.Size size) {
+        return availableShips.get(size);
+    }
+
+    public List<Ship> getShips() {
+        return ships;
+    }
+
+    private void decrementAvailabelShipCount(Ship.Size size) throws NoShipsAvailableException {
+        Integer count = availableShips.get(size);
+        if (count < 1)
+            throw new NoShipsAvailableException();
+        count--;
+        availableShips.put(size, count);
+    }
+
+
+    /**
+     * Gets field data at position given
+     *
+     * @param row
+     * @param col
+     * @return
+     */
+    public Field getField(Integer row, Integer col) {
+        return map[row][col];
+    }
+
+    /**
+     * Gets score counted as number of ship segments that hasn't been hit
+     *
+     * @return
+     */
+    public Integer getScore() {
+        throw new RuntimeException("Not implemented");
+    }
+
+
+    private void markPositionOnMap(Ship ship)
+            throws OutsideOfMapPlacementException {
+        Bounds bounds = new Bounds(ship);
+
+        markForbiddenAreaOnMap(bounds, ship);
+        markShipPositionOnMap(ship);
+    }
+
+    private void markShipPositionOnMap(Ship ship) {
+
+        int r = ship.getPosition().getRow();
+        int c = ship.getPosition().getCol();
+        Integer length = ship.getSize().getSize();
+
+        if (ship.getDirection() == Ship.Direction.VERTICAL) {
             Integer col = ship.getPosition().getCol();
             for (int row = r; row < r + length; row++) {
                 map[row][col].setState(Field.State.SHIP);
             }
         } else {
-            //horizontal
-            throw new RuntimeException("Not implemented");
+            Integer row = ship.getPosition().getRow();
+            for (int col = c; col < c + length; col++) {
+                map[row][col].setState(Field.State.SHIP);
+            }
         }
     }
 
-    public Boolean shootAt(Field position) {
+    private void markForbiddenAreaOnMap(Bounds bounds, Ship ship) {
+        for (int across = bounds.firstForbiddenAcross; across <= bounds.lastForbiddenAcross; across++) {
+            for (int along = bounds.firstForbiddenAlong; along <= bounds.lastForbiddenAlong; along++) {
+                if (ship.getDirection() == Ship.Direction.VERTICAL) {
+                    map[across][along].setState(Field.State.FORBIDDEN);
+                } else {
+                    map[along][across].setState(Field.State.FORBIDDEN);
+                }
+            }
+        }
+    }
+
+    private Ship getShipAtPosition(Field position) {
         throw new RuntimeException("Not implemented");
     }
 
-    public Integer getAvailableShipCount(Ship.Size size) {
-        return availableShips.get(size);
-    }
+    private static class Bounds {
 
-    public Field getField(Integer row, Integer col) {
-        return map[row][col];
+        int firstForbiddenAcross, lastForbiddenAcross, firstForbiddenAlong, lastForbiddenAlong;
+
+        public Bounds(Ship ship) throws OutsideOfMapPlacementException {
+
+            int r = ship.getPosition().getRow();
+            int c = ship.getPosition().getCol();
+            Integer length = ship.getSize().getSize();
+
+            if (c < 0 || r < 0)
+                throw new OutsideOfMapPlacementException();
+
+            if (ship.getDirection() == Ship.Direction.VERTICAL) {
+                if (r + length > mapSize - 1) {
+                    throw new OutsideOfMapPlacementException();
+                }
+                //mark adjacent positions as forbidden
+                firstForbiddenAcross = r - 1;
+                lastForbiddenAcross = r + length;
+                firstForbiddenAlong = c - 1;
+                lastForbiddenAlong = c + 1;
+            } else {
+                if (c + length > mapSize - 1) {
+                    throw new OutsideOfMapPlacementException();
+                }
+                //mark adjacent positions as forbidden
+                firstForbiddenAcross = c - 1;
+                lastForbiddenAcross = c + length;
+                firstForbiddenAlong = r - 1;
+                lastForbiddenAlong = r + 1;
+            }
+
+            fixMarkingBounds();
+
+        }
+
+        private void fixMarkingBounds() {
+
+            if (firstForbiddenAcross < 0) {
+                firstForbiddenAcross = 0;
+            }
+            if (firstForbiddenAlong < 0) {
+                firstForbiddenAlong = 0;
+            }
+            if (lastForbiddenAcross > mapSize - 1) {
+                lastForbiddenAcross = mapSize - 1;
+            }
+            if (lastForbiddenAlong > mapSize - 1) {
+                lastForbiddenAlong = mapSize - 1;
+            }
+        }
+
     }
 }

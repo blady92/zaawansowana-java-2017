@@ -22,43 +22,52 @@ class Ship {
     /**
      * @return the direction
      */
-    public Boolean getDirection() {
+    public Direction getDirection() {
         return direction;
     }
 
     public enum Size {
-        ONE, TWO, THREE, FOUR
+        ONE(1), TWO(2), THREE(3), FOUR(4);
+
+        private final int size;
+
+        Size(int size) {
+            this.size = size;
+        }
+
+        public int getSize() {
+            return size;
+        }
+    }
+
+    public enum Direction {
+        HORIZONTAL, VERTICAL
     }
 
     private Size size;
     private Field position;
-    private Boolean direction;
+    private Direction direction;
+    private Integer lives;
 
     /**
      * @param shipSize
      * @param startPosition
      * @param direction     <b>true</b> if vertical, <b>false</b> otherwise
      */
-    public Ship(Size shipSize, Field startPosition, Boolean direction) {
+    public Ship(Size shipSize, Field startPosition, Direction direction) {
         this.size = shipSize;
         this.position = startPosition;
         this.direction = direction;
+        this.lives = shipSize.getSize();
     }
 
-    public Integer getSizeAsInteger() {
-        switch (size) {
-            case ONE:
-                return 1;
-            case TWO:
-                return 2;
-            case THREE:
-                return 3;
-            case FOUR:
-                return 4;
-            default:
-                throw new IllegalStateException(
-                        "There is no other size, it should have never happened"
-                );
+    public void hitTheShip() {
+        if (lives > 0) {
+            lives--;
         }
+    }
+
+    public boolean isSunken() {
+        return lives == 0;
     }
 }
