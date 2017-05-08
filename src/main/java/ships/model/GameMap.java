@@ -118,9 +118,26 @@ public class GameMap implements Map {
      *
      * @param position position to shoot at
      * @return <b>true</b> if hit, <b>false</b> otherwise
+     * @throws ships.exception.OutsideOfMapPlacementException
      */
-    public Boolean shootAt(Field position) {
-        throw new RuntimeException("Not implemented");
+    public Boolean shootAt(Field position) throws OutsideOfMapPlacementException {
+        Field fieldToShoot = null;
+        //HACK: should be separate method with Field param
+        if (!checkShipValidity(new Ship(Ship.Size.ONE, position, Ship.Direction.VERTICAL))) {
+            throw new OutsideOfMapPlacementException();
+        }
+        for(Field[] fv : map) {
+            for(Field f : fv) {
+                if(f.samePosition(position)) {
+                    fieldToShoot = f;
+                    break;
+                }
+            }
+        }
+        if(fieldToShoot == null) {
+            throw new RuntimeException("Position ["+position.getRow()+","+position.getCol()+"] not found!");
+        }
+        return fieldToShoot.attack();
     }
 
     /**
@@ -163,11 +180,30 @@ public class GameMap implements Map {
      * @return
      */
     public Integer getScore() {
-        throw new RuntimeException("Not implemented");
+        if (!isDeploymentFinished()) {
+            return 0;
+        }
+        Integer score = 0;
+        for (Field[] fa : map) {
+            for (Field f : fa) {
+                if (f.isShipHere() && !f.isAttacked()) {
+                    score++;
+                }
+            }
+        }
+        return score;
     }
 
-    private void markPositionOnMap(Ship ship)
-            throws OutsideOfMapPlacementException {
+    public Boolean isDeploymentFinished() {
+        for (Object v : availableShips.values()) {
+            if ((Integer) v != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void markPositionOnMap(Ship ship) {
         Bounds bounds = new Bounds(ship);
 
         markForbiddenAreaOnMap(bounds, ship);

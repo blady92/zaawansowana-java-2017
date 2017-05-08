@@ -31,5 +31,7 @@ public interface Field {
 
     State getState();
 
-    void attack();
+    Boolean attack();
+
+    boolean samePosition(Field f);
 }

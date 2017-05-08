@@ -25,8 +25,6 @@ public class GameMapTest {
     }
 
     @Test
-    @Ignore
-    //TODO: investigate
     public void shouldPlaceShipVerticallyOnMap() throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
@@ -61,8 +59,6 @@ public class GameMapTest {
     }
 
     @Test
-    @Ignore
-    //TODO: investigate
     public void shouldPlaceShipHorizontallyOnMap() throws ShipGameException {
         //given
         Field startF = new FieldImpl(Field.State.EMPTY, 0, 0);
@@ -131,6 +127,45 @@ public class GameMapTest {
             //then
             assertEquals(ex.getCollisions(), expected);
         }
+    }
+
+    @Test
+    public void shouldReturnScoreAtStart() throws ShipGameException {
+        //given
+        objectUnderTest.placeShip(new Ship(Ship.Size.FOUR, new FieldImpl(0, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.THREE, new FieldImpl(2, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.THREE, new FieldImpl(4, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.TWO, new FieldImpl(6, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.TWO, new FieldImpl(6, 3), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.TWO, new FieldImpl(8, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 3), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 5), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 7), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 9), Ship.Direction.HORIZONTAL));
+        //when
+        //then
+        assertTrue(objectUnderTest.isDeploymentFinished());
+        assertEquals((Integer) 20, objectUnderTest.getScore());
+    }
+
+    @Test
+    public void shouldHitTheShipAndReturnValidScore() throws ShipGameException {
+        //given
+        objectUnderTest.placeShip(new Ship(Ship.Size.FOUR, new FieldImpl(0, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.THREE, new FieldImpl(2, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.THREE, new FieldImpl(4, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.TWO, new FieldImpl(6, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.TWO, new FieldImpl(6, 3), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.TWO, new FieldImpl(8, 0), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 3), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 5), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 7), Ship.Direction.HORIZONTAL));
+        objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 9), Ship.Direction.HORIZONTAL));
+        //when
+        objectUnderTest.shootAt(new FieldImpl(0, 0));
+        //then
+        assertTrue(objectUnderTest.getField(0, 0).isAttacked());
+        assertEquals((Integer) 19, objectUnderTest.getScore());
     }
 
     @Test

@@ -25,7 +25,7 @@ interface Map {
      * @param position position to shoot at
      * @return <b>true</b> if hit, <b>false</b> otherwise
      */
-    Boolean shootAt(Field position);
+    Boolean shootAt(Field position) throws OutsideOfMapPlacementException;
 
     /**
      * Gets number of ships of size given user can still place on map
