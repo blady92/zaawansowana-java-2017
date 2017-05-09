@@ -25,13 +25,6 @@ public class FieldImpl implements Field {
         this.attacked = Boolean.FALSE;
     }
 
-    public FieldImpl(int row, int col) {
-        this.state = State.EMPTY;
-        this.row = row;
-        this.col = col;
-        this.attacked = Boolean.FALSE;
-    }
-
     public int getRow() {
         return row;
     }
