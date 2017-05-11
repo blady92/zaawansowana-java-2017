@@ -5,21 +5,27 @@
  */
 package ships.view;
 
+import ships.exception.OutsideOfMapPlacementException;
+
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import ships.exception.OutsideOfMapPlacementException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 
-/**
- *
- * @author r4pt0r
- */
 public class BattleshipsMap extends Canvas {
 
     private Color backgroundColor = Color.WHITE;
     private final Integer mapSize = 10;
     private final Color[][] bgs = new Color[mapSize][mapSize];
+
+    private List<BattleshipMapClickObserver> observers;
 
     public BattleshipsMap() {
         super();
@@ -28,6 +34,8 @@ public class BattleshipsMap extends Canvas {
                 c = null;
             }
         }
+        observers = new ArrayList<>();
+        this.addMouseListener(new MouseEventObserver());
     }
 
     @Override
@@ -37,7 +45,7 @@ public class BattleshipsMap extends Canvas {
         Rectangle bounds = this.getBounds();
         grphcs.fillRect(0, 0, bounds.width, bounds.height);
         grphcs.setColor(Color.BLACK);
-        grphcs.drawRect(0, 0, bounds.width - 1, bounds.height - 1);
+        grphcs.drawRect(0, 0, bounds.width-1, bounds.height-1);
         drawGrid(grphcs);
         fillFields(grphcs);
     }
@@ -47,12 +55,12 @@ public class BattleshipsMap extends Canvas {
         grphcs.setColor(Color.BLACK);
         //vertical lines
         for (int i = 1; i < mapSize; i++) {
-            grphcs.drawLine(i * (bounds.width / mapSize), 0, i * (bounds.width / mapSize), bounds.height);
+            grphcs.drawLine(i*(bounds.width/mapSize), 0, i*(bounds.width/mapSize), bounds.height);
         }
 
         //horizontal lines
         for (int i = 1; i < mapSize; i++) {
-            grphcs.drawLine(0, i * (bounds.height / mapSize), bounds.width, i * (bounds.height / mapSize));
+            grphcs.drawLine(0, i*(bounds.height/mapSize), bounds.width, i*(bounds.height/mapSize));
         }
     }
 
@@ -70,26 +78,31 @@ public class BattleshipsMap extends Canvas {
     private void fillField(int row, int col, Color color, Graphics grphcs) {
         grphcs.setColor(color);
         grphcs.fillRect(
-                col * (this.getBounds().width / mapSize) + 1,
-                row * (this.getBounds().height / mapSize) + 1,
-                (this.getBounds().width / mapSize) - 1,
-                (this.getBounds().height / mapSize) - 1
+                col*(this.getBounds().width/mapSize)+1,
+                row*(this.getBounds().height/mapSize)+1,
+                (this.getBounds().width/mapSize)-1,
+                (this.getBounds().height/mapSize)-1
         );
     }
 
     public void fillField(int row, int col, Color color) throws OutsideOfMapPlacementException {
-        if (row < 0 || row >= mapSize || col < 0 || col >= mapSize) {
+        if(row < 0 || row >= mapSize || col < 0 || col >= mapSize)
             throw new OutsideOfMapPlacementException();
-        }
         bgs[row][col] = color;
+        this.repaint();
     }
 
     public void clearField(int row, int col) throws OutsideOfMapPlacementException {
-        if (row < 0 || row >= mapSize || col < 0 || col >= mapSize) {
+        if(row < 0 || row >= mapSize || col < 0 || col >= mapSize)
             throw new OutsideOfMapPlacementException();
-        }
         bgs[row][col] = null;
+        this.repaint();
     }
+
+    public boolean isFieldFilled(int row, int col) {
+        return bgs[row][col] != null;
+    }
+
 
     /**
      * @return map background
@@ -103,5 +116,28 @@ public class BattleshipsMap extends Canvas {
      */
     public void setBackgroundColor(Color background) {
         this.backgroundColor = background;
+        this.repaint();
     }
+
+    public void addFieldClickObserver(BattleshipMapClickObserver o) {
+        observers.add(o);
+    }
+
+    private class MouseEventObserver extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent me) {
+            super.mouseClicked(me);
+            Rectangle bounds = BattleshipsMap.this.getBounds();
+            int row = me.getY()*10/bounds.height;
+            int col = me.getX()*10/bounds.width;
+            FieldClickEvent fce = new FieldClickEventImpl(row, col, me.getButton());
+            for(BattleshipMapClickObserver o : observers) {
+                o.fieldClickedEvent(fce, BattleshipsMap.this);
+            }
+        }
+
+    }
+
+
 }
