@@ -128,7 +128,7 @@ public class GameMap implements Map {
         }
         for(Field[] fv : map) {
             for(Field f : fv) {
-                if(f.samePosition(position)) {
+                if(f.equals(position)) {
                     fieldToShoot = f;
                     break;
                 }

@@ -1,9 +1,12 @@
 package ships.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Mateusz Kozlowski
  */
-class Ship {
+public class Ship {
 
     /**
      * @return the size
