@@ -5,19 +5,14 @@
  */
 package ships.view;
 
-import ships.exception.OutsideOfMapPlacementException;
-
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.PLAIN_MESSAGE;
+import ships.exception.OutsideOfMapPlacementException;
 
 public class BattleshipsMap extends Canvas {
 
