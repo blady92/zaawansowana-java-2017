@@ -9,28 +9,26 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
+import java.awt.event.ItemEvent;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import ships.exception.OutsideOfMapPlacementException;
+import ships.model.Field;
+import ships.model.FieldImpl;
+import ships.model.GameMap;
+import ships.model.ShipPlacementMode;
+import ships.model.Ship;
 
 /**
  *
  * @author r4pt0r
  */
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.LayoutManager;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
-
-/**
- * @author r4pt0r
- */
 public class GUI extends javax.swing.JFrame {
 
-    private BattleshipsMap playerMap,opponentMap;
+    private BattleshipsMap playerMap, opponentMap;
+    private GameMap playerGame, opponentGame;
+    private ShipPlacementMode mode;
 
     /**
      * Creates new form GUI
@@ -45,12 +43,10 @@ public class GUI extends javax.swing.JFrame {
         opponentMap = new BattleshipsMap();
         opponentMap.setBounds(0, 0, anotherPlayerMap.getWidth(), anotherPlayerMap.getHeight());
         anotherPlayerMap.add(opponentMap, BorderLayout.WEST);
-        try {
-            playerMap.fillField(1, 2, Color.yellow);
-        } catch (OutsideOfMapPlacementException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
         playerMap.addFieldSelectObserver(new MapClickObserver());
+        mode = new ShipPlacementMode();
+        playerGame = new GameMap();
+        opponentGame = new GameMap();
     }
 
     /**
@@ -216,15 +212,55 @@ public class GUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fourPickerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_fourPickerItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            threePicker.setSelected(false);
+            twoPicker.setSelected(false);
+            onePicker.setSelected(false);
+            mode.setSize(Ship.Size.FOUR);
+            mode.activate();
+        }
+        else {
+            mode.deactivate();
+        }
     }//GEN-LAST:event_fourPickerItemStateChanged
 
     private void threePickerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_threePickerItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            fourPicker.setSelected(false);
+            twoPicker.setSelected(false);
+            onePicker.setSelected(false);
+            mode.setSize(Ship.Size.THREE);
+            mode.activate();
+        }
+        else {
+            mode.deactivate();
+        }
     }//GEN-LAST:event_threePickerItemStateChanged
 
     private void twoPickerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_twoPickerItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            fourPicker.setSelected(false);
+            threePicker.setSelected(false);
+            onePicker.setSelected(false);
+            mode.setSize(Ship.Size.TWO);
+            mode.activate();
+        }
+        else {
+            mode.deactivate();
+        }
     }//GEN-LAST:event_twoPickerItemStateChanged
 
     private void onePickerItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_onePickerItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            fourPicker.setSelected(false);
+            threePicker.setSelected(false);
+            twoPicker.setSelected(false);
+            mode.setSize(Ship.Size.ONE);
+            mode.activate();
+        }
+        else {
+            mode.deactivate();
+        }
     }//GEN-LAST:event_onePickerItemStateChanged
 
     /**
@@ -279,13 +315,35 @@ public class GUI extends javax.swing.JFrame {
         @Override
         public void fieldClickedEvent(FieldSelectEvent fce, BattleshipsMap bm) {
             try {
-                if(fce.getButton() == FieldSelectEventImpl.NOBUTTON) {
+                if (fce.getButton() == FieldSelectEventImpl.NOBUTTON) {
                     //move
-                    bm.fillField(fce.getRow(), fce.getCol(), Color.CYAN);
+                    playerMap.clearAllFields(Color.GREEN);
+                    playerMap.clearAllFields(Color.RED);
+                    if (!mode.isActive()) {
+                        return;
+                    }
+                    Ship ship = new Ship(mode.getSize(), new FieldImpl(fce.getRow(), fce.getCol()), mode.getDir());
+                    List<Field> conflicts = playerGame.isAbleToPlaceShip(ship);
+                    for(Field f : ship.getFieldList()) {
+                        try {
+                            bm.fillField(f.getRow(), f.getCol(), Color.GREEN);
+                        }
+                        catch(OutsideOfMapPlacementException ex) {/*intentionally do nothing*/}
+                    }
+                    for(Field f : conflicts) {
+                        bm.fillField(f.getRow(), f.getCol(), Color.RED);
+                    }
                     return;
                 }
-                if (fce.getButton() != FieldSelectEventImpl.BUTTON1) {
-                    //right + middle
+                if (fce.getButton() == FieldSelectEventImpl.BUTTON3) {
+                    //right
+                    if (mode.isActive()) {
+                        mode.switchDirection();
+                    }
+                    return;
+                }
+                if (fce.getButton() == FieldSelectEventImpl.BUTTON2) {
+                    //middle
                     return;
                 }
                 //left
