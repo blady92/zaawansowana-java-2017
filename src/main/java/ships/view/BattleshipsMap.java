@@ -12,6 +12,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.event.MouseInputAdapter;
 import ships.exception.OutsideOfMapPlacementException;
 
 public class BattleshipsMap extends Canvas {
@@ -19,6 +20,7 @@ public class BattleshipsMap extends Canvas {
     private Color backgroundColor = Color.WHITE;
     private final Integer mapSize = 10;
     private final Color[][] bgs = new Color[mapSize][mapSize];
+    private int lastRow = 0, lastCol = 0;
 
     private List<BattleshipMapClickObserver> observers;
 
@@ -30,7 +32,9 @@ public class BattleshipsMap extends Canvas {
             }
         }
         observers = new ArrayList<>();
-        this.addMouseListener(new MouseEventObserver());
+        MouseEventObserver ml = new MouseEventObserver();
+        this.addMouseListener(ml);
+        this.addMouseMotionListener(ml);
     }
 
     @Override
@@ -118,11 +122,11 @@ public class BattleshipsMap extends Canvas {
         observers.add(o);
     }
 
-    private class MouseEventObserver extends MouseAdapter {
+    private class MouseEventObserver extends MouseInputAdapter {
 
         @Override
         public void mouseClicked(MouseEvent me) {
-            super.mouseClicked(me);
+//            super.mouseClicked(me);
             Rectangle bounds = BattleshipsMap.this.getBounds();
             int row = me.getY()*10/bounds.height;
             int col = me.getX()*10/bounds.width;
@@ -132,6 +136,26 @@ public class BattleshipsMap extends Canvas {
                 o.fieldClickedEvent(fce, BattleshipsMap.this);
             }
         }
+
+        @Override
+        public void mouseMoved(MouseEvent me) {
+//            super.mouseMoved(me);
+            Rectangle bounds = BattleshipsMap.this.getBounds();
+            int row = me.getY()*10/bounds.height;
+            int col = me.getX()*10/bounds.width;
+            if(row != lastRow || col != lastCol)
+            {
+                FieldSelectEvent fce = new FieldSelectEventImpl(row, col,
+                        FieldSelectEventImpl.NOBUTTON);
+                for(BattleshipMapClickObserver o : observers) {
+                    o.fieldClickedEvent(fce, BattleshipsMap.this);
+                }
+                lastCol = col;
+                lastRow = row;
+            }
+        }
+
+
 
     }
 

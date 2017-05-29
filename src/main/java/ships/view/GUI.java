@@ -237,11 +237,21 @@ public class GUI extends javax.swing.JFrame {
         @Override
         public void fieldClickedEvent(FieldSelectEvent fce, BattleshipsMap bm) {
             try {
-                if (bm.isFieldFilled(fce.getRow(), fce.getCol())) {
-                    bm.clearField(fce.getRow(), fce.getCol());
+                if(fce.getButton() == FieldSelectEventImpl.NOBUTTON) {
+                    //move
+                    bm.fillField(fce.getRow(), fce.getCol(), Color.CYAN);
+                    return;
+                }
+                if (fce.getButton() != FieldSelectEventImpl.BUTTON1) {
+                    //right + middle
+                    return;
+                }
+                //left
+                if (!bm.isFieldFilled(fce.getRow(), fce.getCol())) {
+                    bm.fillField(fce.getRow(), fce.getCol(), Color.yellow);
                 }
                 else {
-                    bm.fillField(fce.getRow(), fce.getCol(), Color.yellow);
+                    bm.clearField(fce.getRow(), fce.getCol());
                 }
             }
             catch(OutsideOfMapPlacementException ex) {
