@@ -43,10 +43,10 @@ public class BattleshipsMap extends Canvas {
         grphcs.setColor(backgroundColor);
         Rectangle bounds = this.getBounds();
         grphcs.fillRect(0, 0, bounds.width, bounds.height);
+        fillFields(grphcs);
         grphcs.setColor(Color.BLACK);
         grphcs.drawRect(0, 0, bounds.width-1, bounds.height-1);
         drawGrid(grphcs);
-        fillFields(grphcs);
     }
 
     private void drawGrid(Graphics grphcs) {
@@ -95,6 +95,17 @@ public class BattleshipsMap extends Canvas {
         if(row < 0 || row >= mapSize || col < 0 || col >= mapSize)
             throw new OutsideOfMapPlacementException();
         bgs[row][col] = null;
+        this.repaint();
+    }
+
+    public void clearAllFields(Color clr) {
+        for (int i = 0; i < bgs.length; i++) {
+            for (int j = 0; j < bgs[i].length; j++) {
+                if (bgs[i][j] == clr) {
+                    bgs[i][j] = null;
+                }
+            }
+        }
         this.repaint();
     }
 
