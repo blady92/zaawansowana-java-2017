@@ -1,9 +1,12 @@
 package ships.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Mateusz Kozlowski
  */
-class Ship {
+public class Ship {
 
     /**
      * @return the size
@@ -70,4 +73,20 @@ class Ship {
     public boolean isSunken() {
         return lives == 0;
     }
+
+    public List<Field> getFieldList() {
+        List<Field> result = new ArrayList<>();
+        for (int i = 0; i < this.getSize().getSize(); i++) {
+            if (this.direction == Direction.HORIZONTAL) {
+                result.add(new FieldImpl(
+                        position.getRow(), position.getCol() + i));
+            }
+            else {
+                result.add(new FieldImpl(
+                        position.getRow() + i, position.getCol()));
+            }
+        }
+        return result;
+    }
+
 }

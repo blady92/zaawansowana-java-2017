@@ -91,6 +91,24 @@ public class GameMap implements Map {
     public List<Field> isAbleToPlaceShip(Ship ship) {
 
         List<Field> conflicts = new ArrayList<>();
+        if (!checkShipValidity(ship)) {
+            if (ship.getDirection() == Ship.Direction.HORIZONTAL) {
+                for (int i = ship.getPosition().getCol();
+                        i < ship.getPosition().getCol() + ship.getSize().getSize()
+                        && i < mapSize;
+                        i++) {
+                    conflicts.add(new FieldImpl(ship.getPosition().getRow(), i));
+                }
+            } else {
+                for (int i = ship.getPosition().getRow();
+                        i < ship.getPosition().getRow() + ship.getSize().getSize()
+                        && i < mapSize;
+                        i++) {
+                    conflicts.add(new FieldImpl(i, ship.getPosition().getCol()));
+                }
+            }
+            return conflicts;
+        }
         int r = ship.getPosition().getRow();
         int c = ship.getPosition().getCol();
         Integer length = ship.getSize().getSize();
@@ -128,7 +146,7 @@ public class GameMap implements Map {
         }
         for(Field[] fv : map) {
             for(Field f : fv) {
-                if(f.samePosition(position)) {
+                if(f.equals(position)) {
                     fieldToShoot = f;
                     break;
                 }

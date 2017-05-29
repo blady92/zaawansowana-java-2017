@@ -33,5 +33,5 @@ public interface Field {
 
     Boolean attack();
 
-    boolean samePosition(Field f);
+    boolean same(Field f);
 }

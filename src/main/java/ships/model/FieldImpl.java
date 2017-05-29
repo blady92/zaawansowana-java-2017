@@ -72,27 +72,25 @@ public class FieldImpl implements Field {
     }
 
     @Override
-    public boolean samePosition(Field f) {
-        return this.getRow() == f.getRow() && this.getCol() == f.getCol();
-    }
-
-    @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+        if (o instanceof Field) {
+            Field obj = (Field) o;
+            if (this.row == obj.getRow() && this.col == obj.getCol()) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        else {
+            return super.equals(o);
         }
-        FieldImpl field = (FieldImpl) o;
-        return row == field.row
-                && col == field.col
-                && Objects.equals(attacked, field.attacked)
-                && state == field.state;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(attacked, state, row, col);
+    public boolean same(Field f) {
+        return this.getRow() == f.getRow()
+                && this.getCol() == f.getCol()
+                && this.state == f.getState()
+                && Objects.equals(this.attacked, f.isAttacked());
     }
 }
