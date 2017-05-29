@@ -50,7 +50,7 @@ public class GUI extends javax.swing.JFrame {
         } catch (OutsideOfMapPlacementException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
-        playerMap.addFieldClickObserver(new MapClickObserver());
+        playerMap.addFieldSelectObserver(new MapClickObserver());
     }
 
     /**
@@ -235,7 +235,7 @@ public class GUI extends javax.swing.JFrame {
 
     public class MapClickObserver implements BattleshipMapClickObserver {
         @Override
-        public void fieldClickedEvent(FieldClickEvent fce, BattleshipsMap bm) {
+        public void fieldClickedEvent(FieldSelectEvent fce, BattleshipsMap bm) {
             try {
                 if (bm.isFieldFilled(fce.getRow(), fce.getCol())) {
                     bm.clearField(fce.getRow(), fce.getCol());

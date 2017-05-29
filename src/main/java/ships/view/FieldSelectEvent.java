@@ -1,6 +1,6 @@
 package ships.view;
 
-public interface FieldClickEvent {
+public interface FieldSelectEvent {
 
     /**
      * @return the row

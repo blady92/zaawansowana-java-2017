@@ -114,7 +114,7 @@ public class BattleshipsMap extends Canvas {
         this.repaint();
     }
 
-    public void addFieldClickObserver(BattleshipMapClickObserver o) {
+    public void addFieldSelectObserver(BattleshipMapClickObserver o) {
         observers.add(o);
     }
 
@@ -126,7 +126,8 @@ public class BattleshipsMap extends Canvas {
             Rectangle bounds = BattleshipsMap.this.getBounds();
             int row = me.getY()*10/bounds.height;
             int col = me.getX()*10/bounds.width;
-            FieldClickEvent fce = new FieldClickEventImpl(row, col, me.getButton());
+            FieldSelectEvent fce = new FieldSelectEventImpl(
+                    row, col, me.getButton());
             for(BattleshipMapClickObserver o : observers) {
                 o.fieldClickedEvent(fce, BattleshipsMap.this);
             }
