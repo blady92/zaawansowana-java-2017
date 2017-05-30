@@ -4,10 +4,12 @@ import ships.exception.CollidesWithAnotherShipException;
 import ships.exception.NoShipsAvailableException;
 import ships.exception.OutsideOfMapPlacementException;
 
+import java.util.List;
+
 /**
  * @author Mateusz Kozlowski
  */
-interface Map {
+public interface Map {
 
     /**
      * Places ship at given position
@@ -43,4 +45,12 @@ interface Map {
      * @return
      */
     Field getField(Integer row, Integer col);
+
+    /**
+     * Checks if it is possible to place ship at given position
+     *
+     * @param ship
+     * @return conflicted field location array
+     */
+    List<Field> isAbleToPlaceShip(Ship ship);
 }
