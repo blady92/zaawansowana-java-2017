@@ -12,15 +12,19 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.MouseInputAdapter;
 import ships.exception.OutsideOfMapPlacementException;
+import ships.model.Ship;
+import ships.model.ShipPlacementMode;
 
 public class BattleshipsMap extends Canvas {
 
     private Color backgroundColor = Color.WHITE;
     private final Integer mapSize = 10;
     private final Color[][] bgs = new Color[mapSize][mapSize];
-    private int lastRow = 0, lastCol = 0;
+    private ShipPlacementMode mode;
 
     private List<BattleshipMapClickObserver> observers;
 
@@ -35,6 +39,7 @@ public class BattleshipsMap extends Canvas {
         MouseEventObserver ml = new MouseEventObserver();
         this.addMouseListener(ml);
         this.addMouseMotionListener(ml);
+        mode = new ShipPlacementMode();
     }
 
     @Override
@@ -133,42 +138,50 @@ public class BattleshipsMap extends Canvas {
         observers.add(o);
     }
 
+    public void startPlacement(Ship.Size size) {
+        mode.setSize(size);
+        mode.activate();
+    }
+
+    public void stopPlacement() {
+        mode.deactivate();
+    }
+
+    public ShipPlacementMode getMode() {
+        Logger.getLogger(GUI.class.getName()).log(Level.WARNING, "TODO: remove temporary method");
+        return mode;
+    }
+
+
     private class MouseEventObserver extends MouseInputAdapter {
+
+        private int lastRow = 0, lastCol = 0;
 
         @Override
         public void mouseClicked(MouseEvent me) {
-//            super.mouseClicked(me);
-            Rectangle bounds = BattleshipsMap.this.getBounds();
-            int row = me.getY()*10/bounds.height;
-            int col = me.getX()*10/bounds.width;
-            FieldSelectEvent fce = new FieldSelectEventImpl(
-                    row, col, me.getButton());
-            for(BattleshipMapClickObserver o : observers) {
-                o.fieldClickedEvent(fce, BattleshipsMap.this);
-            }
+            mouseEvent(me, false);
         }
 
         @Override
         public void mouseMoved(MouseEvent me) {
-//            super.mouseMoved(me);
+            mouseEvent(me, true);
+        }
+
+        private void mouseEvent(MouseEvent me, boolean selectedRowChanged) {
             Rectangle bounds = BattleshipsMap.this.getBounds();
             int row = me.getY()*10/bounds.height;
             int col = me.getX()*10/bounds.width;
-            if(row != lastRow || col != lastCol)
+            if(selectedRowChanged && ( row != lastRow || col != lastCol ) )
             {
-                FieldSelectEvent fce = new FieldSelectEventImpl(row, col,
-                        FieldSelectEventImpl.NOBUTTON);
-                for(BattleshipMapClickObserver o : observers) {
-                    o.fieldClickedEvent(fce, BattleshipsMap.this);
-                }
                 lastCol = col;
                 lastRow = row;
             }
+            else if(selectedRowChanged)
+                return;
+            FieldSelectEvent fce = new FieldSelectEventImpl(row, col, me.getButton());
+            for(BattleshipMapClickObserver o : observers) {
+                o.fieldClickedEvent(fce, BattleshipsMap.this);
+            }
         }
-
-
-
     }
-
-
 }
