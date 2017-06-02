@@ -1,10 +1,9 @@
 package ships.view;
 
+import ships.exception.CollidesWithAnotherShipException;
+import ships.exception.NoShipsAvailableException;
 import ships.exception.OutsideOfMapPlacementException;
-import ships.model.Field;
-import ships.model.FieldImpl;
-import ships.model.Map;
-import ships.model.Ship;
+import ships.model.*;
 
 import java.awt.*;
 import java.util.logging.Level;
@@ -19,10 +18,18 @@ public class BattleshipsPlayerMap extends BattleshipsMap {
         this.addFieldSelectObserver(mco);
     }
 
-    @Override
-    public void paint(Graphics grphcs) {
-        super.paint(grphcs);
-        //TODO: paint player ships
+    private void showShipsOnMap() {
+        for (int i = 0; i < GameMap.mapSize; i++) {
+            for (int j = 0; j < GameMap.mapSize; j++) {
+                if (game.getField(i, j).isShipHere()) {
+                    try {
+                        fillField(i, j, Color.GRAY);
+                    } catch (OutsideOfMapPlacementException ex) {
+                        Logger.getLogger(BattleshipsPlayerMap.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
     }
 
     public void startPlacement(Ship.Size size) {
@@ -48,6 +55,7 @@ public class BattleshipsPlayerMap extends BattleshipsMap {
                     if (!mode.isActive()) {
                         return;
                     }
+                    showShipsOnMap();
                     Ship ship = new Ship(
                             mode.getSize(),
                             new FieldImpl(fce.getRow(), fce.getCol()),
@@ -76,16 +84,25 @@ public class BattleshipsPlayerMap extends BattleshipsMap {
                     //middle
                     return;
                 }
-                //left
-                if (!bm.isFieldFilled(fce.getRow(), fce.getCol())) {
-                    bm.fillField(fce.getRow(), fce.getCol(), Color.yellow);
+                if (fce.getButton() != FieldSelectEventImpl.BUTTON1) {
+                    //unsupported mouse button
+                    return;
                 }
-                else {
-                    bm.clearField(fce.getRow(), fce.getCol());
+                //left
+                Ship ship = new Ship(mode.getSize(), new FieldImpl(fce.getRow(), fce.getCol()), mode.getDir());
+                if (mode.isActive() && game.isAbleToPlaceShip(ship).isEmpty()) {
+                    game.placeShip(ship);
+                    showShipsOnMap();
+                    stopPlacement();
+                }
+                if (game.isDeploymentFinished()) {
+                    bm.setBackgroundColor(Color.LIGHT_GRAY);
                 }
             }
             catch(OutsideOfMapPlacementException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CollidesWithAnotherShipException | NoShipsAvailableException ex) {
+                Logger.getLogger(BattleshipsPlayerMap.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

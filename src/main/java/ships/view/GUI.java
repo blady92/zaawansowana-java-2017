@@ -315,6 +315,10 @@ public class GUI extends javax.swing.JFrame {
             updatePicker(threePicker, Ship.Size.THREE);
             updatePicker(fourPicker, Ship.Size.FOUR);
             if (avaiableShipClasses == 0) {
+                fourPicker.setVisible(false);
+                threePicker.setVisible(false);
+                twoPicker.setVisible(false);
+                onePicker.setVisible(false);
                 Logger.getLogger(BattleshipsPlayerMap.class.getName()).log(Level.WARNING, "TODO: hide all pickers");
             }
             if (playerGame.isDeploymentFinished()) {
@@ -323,7 +327,7 @@ public class GUI extends javax.swing.JFrame {
         }
 
         /**
-         * Updates picker label, disable if necessary and deselects
+         * Updates picker label and tooltip, disable if necessary and deselects
          *
          * @param picker
          * @param size

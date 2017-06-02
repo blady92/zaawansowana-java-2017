@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class GameMap implements Map {
 
-    private static final int mapSize = 10;
+    public static final int mapSize = 10;
     private Field[][] map;
     private List<Ship> ships;
     private HashMap<Ship.Size, Integer> availableShips;
