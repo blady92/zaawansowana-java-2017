@@ -100,7 +100,7 @@ public class BattleshipsPlayerMap extends BattleshipsMap {
                 }
             }
             catch(OutsideOfMapPlacementException ex) {
-                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(BattleshipsGame.class.getName()).log(Level.SEVERE, null, ex);
             } catch (CollidesWithAnotherShipException | NoShipsAvailableException ex) {
                 Logger.getLogger(BattleshipsPlayerMap.class.getName()).log(Level.SEVERE, null, ex);
             }
