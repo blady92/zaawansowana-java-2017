@@ -5,6 +5,11 @@ import ships.model.Ship;
 import ships.view.MapView;
 
 public abstract class Game {
+
+    public Game() {
+        this.state = State.PLACEMENT;
+    }
+
     /**
      * @return the state
      */

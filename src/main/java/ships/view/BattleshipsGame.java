@@ -7,6 +7,7 @@ package ships.view;
 
 import ships.controller.Game;
 import ships.controller.PlayerVsComputerGame;
+import ships.exception.ShipGameException;
 import ships.model.Ship;
 
 import javax.swing.*;
@@ -24,11 +25,28 @@ public class BattleshipsGame extends javax.swing.JFrame {
     /**
      * Creates new form GUI
      */
-    public BattleshipsGame() {
+    public BattleshipsGame() throws ShipGameException {
         initComponents();
 
         //create game controller
-        game = new PlayerVsComputerGame();
+        String[] types = {"Player vs Computer", "Player vs Player (LAN)"};
+        String type = (String) JOptionPane.showInputDialog(
+                null,
+                "Choose game type",
+                "Game type",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                types,
+                types[0]
+        );
+
+        switch(type) {
+            case "Player vs Computer":
+                game = new PlayerVsComputerGame();
+                break;
+            default:
+                throw new RuntimeException("Unsupported game type");
+        }
 
         //set sizes of components
         game.getPlayerMapView().setBounds(0, 0, playerPanel.getWidth(), playerPanel.getHeight());
@@ -288,7 +306,11 @@ public class BattleshipsGame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new BattleshipsGame().setVisible(true);
+                try {
+                    new BattleshipsGame().setVisible(true);
+                } catch (ShipGameException ex) {
+                    Logger.getLogger(BattleshipsGame.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -329,6 +351,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
             }
             if (game.getPlayerMap().isDeploymentFinished()) {
                 playerScore.setText(Integer.toString(game.getPlayerMap().getScore()));
+                opponentScore.setText(Integer.toString(game.getOpponentMap().getScore()));
             }
         }
 

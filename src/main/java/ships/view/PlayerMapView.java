@@ -49,7 +49,6 @@ public class PlayerMapView extends MapView {
         public void fieldClickedEvent(FieldSelectEvent fce, MapView bm) {
             try {
                 if (game.isDeploymentFinished()) {
-                    bm.setBackgroundColor(Color.LIGHT_GRAY);
                     return;
                 }
                 if (fce.getButton() == FieldSelectEventImpl.NOBUTTON) {
