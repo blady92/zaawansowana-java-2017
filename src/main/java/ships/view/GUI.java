@@ -9,15 +9,18 @@ import ships.model.GameMap;
 import ships.model.Map;
 import ships.model.Ship;
 
-import java.awt.*;
+import javax.swing.*;
 import java.awt.event.ItemEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author r4pt0r
  */
 public class GUI extends javax.swing.JFrame {
 
-    private BattleshipsMap playerMap, opponentMap;
+    private BattleshipsPlayerMap playerMap;
+    private BattleshipsMap opponentMap;
     private Map playerGame, opponentGame;
 
     /**
@@ -29,11 +32,18 @@ public class GUI extends javax.swing.JFrame {
         playerGame = new GameMap();
         opponentGame = new GameMap();
         playerMap = new BattleshipsPlayerMap(playerGame);
-        playerMap.setBounds(0, 0, thisPlayerMap.getWidth(), thisPlayerMap.getHeight());
-        thisPlayerMap.add(playerMap, BorderLayout.WEST);
         opponentMap = new BattleshipsMap();
+
+        //set sizes of components
+        playerMap.setBounds(0, 0, thisPlayerMap.getWidth(), thisPlayerMap.getHeight());
         opponentMap.setBounds(0, 0, anotherPlayerMap.getWidth(), anotherPlayerMap.getHeight());
-        anotherPlayerMap.add(opponentMap, BorderLayout.WEST);
+
+        //sdd components to panels
+        anotherPlayerMap.add(opponentMap);
+        thisPlayerMap.add(playerMap);
+
+        //listen to click events to update non-gamefield interface
+        playerMap.addFieldSelectObserver(new PlayerObserver());
     }
 
     /**
@@ -289,4 +299,48 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JToggleButton threePicker;
     private javax.swing.JToggleButton twoPicker;
     // End of variables declaration//GEN-END:variables
+
+    class PlayerObserver implements BattleshipMapClickObserver {
+
+        Integer avaiableShipClasses;
+
+        @Override
+        public void fieldClickedEvent(FieldSelectEvent fce, BattleshipsMap bm) {
+            if (fce.getButton() != FieldSelectEventImpl.BUTTON1) {
+                return;
+            }
+            avaiableShipClasses = 4;
+            updatePicker(onePicker, Ship.Size.ONE);
+            updatePicker(twoPicker, Ship.Size.TWO);
+            updatePicker(threePicker, Ship.Size.THREE);
+            updatePicker(fourPicker, Ship.Size.FOUR);
+            if (avaiableShipClasses == 0) {
+                Logger.getLogger(BattleshipsPlayerMap.class.getName()).log(Level.WARNING, "TODO: hide all pickers");
+            }
+            if (playerGame.isDeploymentFinished()) {
+                playerScore.setText(Integer.toString(playerGame.getScore()));
+            }
+        }
+
+        /**
+         * Updates picker label, disable if necessary and deselects
+         *
+         * @param picker
+         * @param size
+         */
+        private void updatePicker(JToggleButton picker, Ship.Size size) {
+            Integer availableShips = playerGame.getAvailableShipCount(size);
+            picker.setText(availableShips.toString());
+            picker.setSelected(false);
+            if (availableShips == 0) {
+                picker.setEnabled(false);
+                avaiableShipClasses--;
+                picker.setToolTipText("no more available");
+                return;
+            }
+            picker.setToolTipText("" + availableShips + " more available");
+        }
+
+
+    }
 }

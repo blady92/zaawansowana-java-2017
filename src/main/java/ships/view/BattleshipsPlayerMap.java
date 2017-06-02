@@ -11,12 +11,30 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BattleshipsPlayerMap extends BattleshipsMap {
-    private MapClickObserver pco = new MapClickObserver();
+    private MapClickObserver mco = new MapClickObserver();
     private Map game = null;
 
     public BattleshipsPlayerMap(Map gameMap) {
         this.game = gameMap;
-        this.addFieldSelectObserver(pco);
+        this.addFieldSelectObserver(mco);
+    }
+
+    @Override
+    public void paint(Graphics grphcs) {
+        super.paint(grphcs);
+        //TODO: paint player ships
+    }
+
+    public void startPlacement(Ship.Size size) {
+        if (game.isDeploymentFinished()) {
+            return;
+        }
+        mode.setSize(size);
+        mode.activate();
+    }
+
+    public void stopPlacement() {
+        mode.deactivate();
     }
 
     public class MapClickObserver implements BattleshipMapClickObserver {
@@ -27,13 +45,13 @@ public class BattleshipsPlayerMap extends BattleshipsMap {
                     //move
                     bm.clearAllFields(Color.GREEN);
                     bm.clearAllFields(Color.RED);
-                    if (!bm.getMode().isActive()) {
+                    if (!mode.isActive()) {
                         return;
                     }
                     Ship ship = new Ship(
-                            bm.getMode().getSize(),
+                            mode.getSize(),
                             new FieldImpl(fce.getRow(), fce.getCol()),
-                            bm.getMode().getDir()
+                            mode.getDir()
                     );
                     java.util.List<Field> conflicts = game.isAbleToPlaceShip(ship);
                     for(Field f : ship.getFieldList()) {
@@ -49,8 +67,8 @@ public class BattleshipsPlayerMap extends BattleshipsMap {
                 }
                 if (fce.getButton() == FieldSelectEventImpl.BUTTON3) {
                     //right
-                    if (bm.getMode().isActive()) {
-                        bm.getMode().switchDirection();
+                    if (mode.isActive()) {
+                        mode.switchDirection();
                     }
                     return;
                 }

@@ -3,11 +3,11 @@ package ships.model;
 import ships.exception.CollidesWithAnotherShipException;
 import ships.exception.NoShipsAvailableException;
 import ships.exception.OutsideOfMapPlacementException;
+import ships.exception.ShipNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import ships.exception.ShipNotFoundException;
 
 /**
  * @author Mateusz Kozlowski
@@ -197,11 +197,11 @@ public class GameMap implements Map {
      *
      * @return
      */
-    public Integer getScore() {
+    public int getScore() {
         if (!isDeploymentFinished()) {
             return 0;
         }
-        Integer score = 0;
+        int score = 0;
         for (Field[] fa : map) {
             for (Field f : fa) {
                 if (f.isShipHere() && !f.isAttacked()) {
@@ -212,7 +212,7 @@ public class GameMap implements Map {
         return score;
     }
 
-    public Boolean isDeploymentFinished() {
+    public boolean isDeploymentFinished() {
         for (Object v : availableShips.values()) {
             if ((Integer) v != 0) {
                 return false;

@@ -53,4 +53,13 @@ public interface Map {
      * @return conflicted field location array
      */
     List<Field> isAbleToPlaceShip(Ship ship);
+
+    boolean isDeploymentFinished();
+
+    /**
+     * Gets score counted as number of ship segments that hasn't been hit
+     *
+     * @return
+     */
+    int getScore();
 }
