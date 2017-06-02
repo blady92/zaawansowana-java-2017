@@ -94,16 +94,16 @@ public class GameMap implements Map {
         if (!checkShipValidity(ship)) {
             if (ship.getDirection() == Ship.Direction.HORIZONTAL) {
                 for (int i = ship.getPosition().getCol();
-                        i < ship.getPosition().getCol() + ship.getSize().getSize()
-                        && i < mapSize;
-                        i++) {
+                     i < ship.getPosition().getCol() + ship.getSize().getSize()
+                             && i < mapSize;
+                     i++) {
                     conflicts.add(new FieldImpl(ship.getPosition().getRow(), i));
                 }
             } else {
                 for (int i = ship.getPosition().getRow();
-                        i < ship.getPosition().getRow() + ship.getSize().getSize()
-                        && i < mapSize;
-                        i++) {
+                     i < ship.getPosition().getRow() + ship.getSize().getSize()
+                             && i < mapSize;
+                     i++) {
                     conflicts.add(new FieldImpl(i, ship.getPosition().getCol()));
                 }
             }
@@ -144,16 +144,16 @@ public class GameMap implements Map {
         if (!checkShipValidity(new Ship(Ship.Size.ONE, position, Ship.Direction.VERTICAL))) {
             throw new OutsideOfMapPlacementException();
         }
-        for(Field[] fv : map) {
-            for(Field f : fv) {
-                if(f.equals(position)) {
+        for (Field[] fv : map) {
+            for (Field f : fv) {
+                if (f.equals(position)) {
                     fieldToShoot = f;
                     break;
                 }
             }
         }
-        if(fieldToShoot == null) {
-            throw new RuntimeException("Position ["+position.getRow()+","+position.getCol()+"] not found!");
+        if (fieldToShoot == null) {
+            throw new RuntimeException("Position [" + position.getRow() + "," + position.getCol() + "] not found!");
         }
         return fieldToShoot.attack();
     }

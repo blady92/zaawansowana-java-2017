@@ -5,33 +5,21 @@ import ships.model.FieldImpl;
 import ships.model.GameMap;
 import ships.model.Ship;
 import ships.view.MapView;
-import ships.view.PlayerMapView;
 
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlayerVsComputerGame extends Game {
 
-    private final PlayerMapView playerMapView;
-    private final MapView opponentMapView;
-
     public PlayerVsComputerGame() throws ShipGameException {
         super();
-
-        this.playerMap = new GameMap();
-        this.opponentMap = new GameMap();
-
-        this.playerMapView = new PlayerMapView(getPlayerMap());
-        this.opponentMapView = new MapView();
-
         placeComputerShips();
     }
 
     @Override
     public void startPlacement(Ship.Size size) {
         playerMapView.startPlacement(size);
-        if (playerMap.isDeploymentFinished() && opponentMap.isDeploymentFinished()) {
-            this.state = State.FIGHT;
-        }
     }
 
     @Override
@@ -57,8 +45,7 @@ public class PlayerVsComputerGame extends Game {
 
     private void placeComputerShips(Ship.Size s) throws ShipGameException {
         Random rand = new Random();
-        while(opponentMap.getAvailableShipCount(s)>0)
-        {
+        while (opponentMap.getAvailableShipCount(s) > 0) {
             Integer x = rand.nextInt(GameMap.mapSize);
             Integer y = rand.nextInt(GameMap.mapSize);
             Boolean dir = rand.nextBoolean();
@@ -67,6 +54,12 @@ public class PlayerVsComputerGame extends Game {
                 opponentMap.placeShip(ship);
             }
         }
+    }
+
+    @Override
+    protected Boolean opponentShooting() {
+        Logger.getLogger(Game.class.getName()).log(Level.INFO, "ping");
+        return false;
     }
 
 }

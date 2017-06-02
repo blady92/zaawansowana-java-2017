@@ -29,7 +29,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
         initComponents();
 
         //create game controller
-        String[] types = {"Player vs Computer", "Player vs Player (LAN)"};
+        String[] types = {"Player vs Computer", "Player vs Player (host)", "Player vs Player (guest)"};
         String type = (String) JOptionPane.showInputDialog(
                 null,
                 "Choose game type",
@@ -40,7 +40,11 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 types[0]
         );
 
-        switch(type) {
+        if (type == null) {
+            System.exit(0);
+        }
+
+        switch (type) {
             case "Player vs Computer":
                 game = new PlayerVsComputerGame();
                 break;
@@ -233,8 +237,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
             twoPicker.setSelected(false);
             onePicker.setSelected(false);
             game.startPlacement(Ship.Size.FOUR);
-        }
-        else {
+        } else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_fourPickerItemStateChanged
@@ -245,8 +248,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
             twoPicker.setSelected(false);
             onePicker.setSelected(false);
             game.startPlacement(Ship.Size.THREE);
-        }
-        else {
+        } else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_threePickerItemStateChanged
@@ -257,8 +259,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
             threePicker.setSelected(false);
             onePicker.setSelected(false);
             game.startPlacement(Ship.Size.TWO);
-        }
-        else {
+        } else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_twoPickerItemStateChanged
@@ -269,8 +270,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
             threePicker.setSelected(false);
             twoPicker.setSelected(false);
             game.startPlacement(Ship.Size.ONE);
-        }
-        else {
+        } else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_onePickerItemStateChanged
@@ -349,19 +349,20 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 onePicker.setVisible(false);
                 Logger.getLogger(PlayerMapView.class.getName()).log(Level.WARNING, "TODO: hide all pickers");
             }
-            if (game.getPlayerMap().isDeploymentFinished()) {
-                playerScore.setText(Integer.toString(game.getPlayerMap().getScore()));
-                opponentScore.setText(Integer.toString(game.getOpponentMap().getScore()));
+            if (game.isDeploymentFinished()) {
+                playerScore.setText(game.getPlayerScore().toString());
+                opponentScore.setText(game.getOpponentScore().toString());
             }
         }
 
         /**
          * Updates picker label and tooltip, disable if necessary and deselects
+         *
          * @param picker
          * @param size
          */
         private void updatePicker(JToggleButton picker, Ship.Size size) {
-            Integer availableShips = game.getPlayerMap().getAvailableShipCount(size);
+            Integer availableShips = game.getAvailableShipCount(size);
             picker.setText(availableShips.toString());
             picker.setSelected(false);
             if (availableShips == 0) {
@@ -370,7 +371,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 picker.setToolTipText("no more available");
                 return;
             }
-            picker.setToolTipText(""+availableShips+" more available");
+            picker.setToolTipText("" + availableShips + " more available");
         }
 
 

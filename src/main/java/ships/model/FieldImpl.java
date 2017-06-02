@@ -63,8 +63,8 @@ public class FieldImpl implements Field {
     }
 
     public Boolean attack() {
+        this.attacked = true;
         if (state == State.SHIP) {
-            this.attacked = true;
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
@@ -77,12 +77,10 @@ public class FieldImpl implements Field {
             Field obj = (Field) o;
             if (this.row == obj.getRow() && this.col == obj.getCol()) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        else {
+        } else {
             return super.equals(o);
         }
     }
