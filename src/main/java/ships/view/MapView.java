@@ -14,16 +14,16 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BattleshipsMap extends Canvas {
+public class MapView extends Canvas {
 
     private Color backgroundColor = Color.WHITE;
     private final Integer mapSize = 10;
     private final Color[][] bgs = new Color[mapSize][mapSize];
     protected ShipPlacementMode mode;
 
-    private List<BattleshipMapClickObserver> observers;
+    private List<MapClickObserver> observers;
 
-    public BattleshipsMap() {
+    public MapView() {
         super();
         observers = new ArrayList<>();
         MouseEventObserver ml = new MouseEventObserver();
@@ -124,7 +124,7 @@ public class BattleshipsMap extends Canvas {
         this.repaint();
     }
 
-    public void addFieldSelectObserver(BattleshipMapClickObserver o) {
+    public void addFieldSelectObserver(MapClickObserver o) {
         observers.add(o);
     }
 
@@ -143,7 +143,7 @@ public class BattleshipsMap extends Canvas {
         }
 
         private void mouseEvent(MouseEvent me, boolean selectedRowChanged) {
-            Rectangle bounds = BattleshipsMap.this.getBounds();
+            Rectangle bounds = MapView.this.getBounds();
             int row = me.getY() * 10 / bounds.height;
             int col = me.getX() * 10 / bounds.width;
             if (selectedRowChanged && (row != lastRow || col != lastCol)) {
@@ -152,8 +152,8 @@ public class BattleshipsMap extends Canvas {
             } else if (selectedRowChanged)
                 return;
             FieldSelectEvent fce = new FieldSelectEventImpl(row, col, me.getButton());
-            for (BattleshipMapClickObserver o : observers) {
-                o.fieldClickedEvent(fce, BattleshipsMap.this);
+            for (MapClickObserver o : observers) {
+                o.fieldClickedEvent(fce, MapView.this);
             }
         }
     }
