@@ -1,19 +1,15 @@
 package ships.model;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import ships.exception.CollidesWithAnotherShipException;
+import ships.exception.ShipGameException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static junitparams.JUnitParamsRunner.$;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import ships.exception.ShipGameException;
+import static org.junit.Assert.*;
 
 public class GameMapTest {
 
@@ -145,7 +141,7 @@ public class GameMapTest {
         //when
         //then
         assertTrue(objectUnderTest.isDeploymentFinished());
-        assertEquals((Integer) 20, objectUnderTest.getScore());
+        assertEquals(20, objectUnderTest.getScore());
     }
 
     @Test
@@ -165,7 +161,7 @@ public class GameMapTest {
         objectUnderTest.shootAt(new FieldImpl(0, 0));
         //then
         assertTrue(objectUnderTest.getField(0, 0).isAttacked());
-        assertEquals((Integer) 19, objectUnderTest.getScore());
+        assertEquals(19, objectUnderTest.getScore());
     }
 
     @Test

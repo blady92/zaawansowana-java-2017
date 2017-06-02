@@ -3,18 +3,18 @@ package ships.model;
 import ships.exception.CollidesWithAnotherShipException;
 import ships.exception.NoShipsAvailableException;
 import ships.exception.OutsideOfMapPlacementException;
+import ships.exception.ShipNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import ships.exception.ShipNotFoundException;
 
 /**
  * @author Mateusz Kozlowski
  */
 public class GameMap implements Map {
 
-    private static final int mapSize = 10;
+    public static final int mapSize = 10;
     private Field[][] map;
     private List<Ship> ships;
     private HashMap<Ship.Size, Integer> availableShips;
@@ -94,16 +94,16 @@ public class GameMap implements Map {
         if (!checkShipValidity(ship)) {
             if (ship.getDirection() == Ship.Direction.HORIZONTAL) {
                 for (int i = ship.getPosition().getCol();
-                        i < ship.getPosition().getCol() + ship.getSize().getSize()
-                        && i < mapSize;
-                        i++) {
+                     i < ship.getPosition().getCol() + ship.getSize().getSize()
+                             && i < mapSize;
+                     i++) {
                     conflicts.add(new FieldImpl(ship.getPosition().getRow(), i));
                 }
             } else {
                 for (int i = ship.getPosition().getRow();
-                        i < ship.getPosition().getRow() + ship.getSize().getSize()
-                        && i < mapSize;
-                        i++) {
+                     i < ship.getPosition().getRow() + ship.getSize().getSize()
+                             && i < mapSize;
+                     i++) {
                     conflicts.add(new FieldImpl(i, ship.getPosition().getCol()));
                 }
             }
@@ -144,16 +144,16 @@ public class GameMap implements Map {
         if (!checkShipValidity(new Ship(Ship.Size.ONE, position, Ship.Direction.VERTICAL))) {
             throw new OutsideOfMapPlacementException();
         }
-        for(Field[] fv : map) {
-            for(Field f : fv) {
-                if(f.equals(position)) {
+        for (Field[] fv : map) {
+            for (Field f : fv) {
+                if (f.equals(position)) {
                     fieldToShoot = f;
                     break;
                 }
             }
         }
-        if(fieldToShoot == null) {
-            throw new RuntimeException("Position ["+position.getRow()+","+position.getCol()+"] not found!");
+        if (fieldToShoot == null) {
+            throw new RuntimeException("Position [" + position.getRow() + "," + position.getCol() + "] not found!");
         }
         return fieldToShoot.attack();
     }
@@ -197,11 +197,11 @@ public class GameMap implements Map {
      *
      * @return
      */
-    public Integer getScore() {
+    public int getScore() {
         if (!isDeploymentFinished()) {
             return 0;
         }
-        Integer score = 0;
+        int score = 0;
         for (Field[] fa : map) {
             for (Field f : fa) {
                 if (f.isShipHere() && !f.isAttacked()) {
@@ -212,7 +212,7 @@ public class GameMap implements Map {
         return score;
     }
 
-    public Boolean isDeploymentFinished() {
+    public boolean isDeploymentFinished() {
         for (Object v : availableShips.values()) {
             if ((Integer) v != 0) {
                 return false;
