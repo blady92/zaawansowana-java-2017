@@ -158,9 +158,10 @@ public class GameMapTest {
         objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 7), Ship.Direction.HORIZONTAL));
         objectUnderTest.placeShip(new Ship(Ship.Size.ONE, new FieldImpl(8, 9), Ship.Direction.HORIZONTAL));
         //when
-        objectUnderTest.shootAt(new FieldImpl(0, 0));
+        objectUnderTest.shootAt(new FieldImpl(8, 7));
         //then
-        assertTrue(objectUnderTest.getField(0, 0).isAttacked());
+        assertTrue(objectUnderTest.getField(8, 7).isAttacked());
+        assertTrue(objectUnderTest.getShipAtPosition(new FieldImpl(8, 7)).isSunken());
         assertEquals(19, objectUnderTest.getScore());
     }
 

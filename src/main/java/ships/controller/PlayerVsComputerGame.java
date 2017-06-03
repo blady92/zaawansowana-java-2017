@@ -7,6 +7,8 @@ import ships.model.FieldImpl;
 import ships.model.GameMap;
 import ships.model.Ship;
 import ships.view.MapView;
+import ships.view.OpponentMapView;
+import ships.view.PlayerMapView;
 
 import java.util.Random;
 import java.util.logging.Level;
@@ -16,6 +18,12 @@ public class PlayerVsComputerGame extends Game {
 
     public PlayerVsComputerGame() throws ShipGameException {
         super();
+        placeComputerShips();
+    }
+
+    public PlayerVsComputerGame(PlayerMapView playerMapView, OpponentMapView opponentMapView) throws ShipGameException {
+        super(playerMapView, opponentMapView);
+
         placeComputerShips();
     }
 

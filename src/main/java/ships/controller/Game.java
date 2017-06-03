@@ -27,6 +27,18 @@ public abstract class Game {
         this.opponentMapView.addFieldSelectObserver(new ClickObserver());
     }
 
+    public Game(PlayerMapView playerMapView, OpponentMapView opponentMapView) {
+        this.state = State.DEPLOYMENT;
+
+        this.playerMap = new GameMap();
+        this.opponentMap = new GameMap();
+
+        this.playerMapView = playerMapView;
+        this.opponentMapView = opponentMapView;
+
+        this.opponentMapView.addFieldSelectObserver(new ClickObserver());
+    }
+
     /**
      * @return the state
      */
@@ -74,6 +86,20 @@ public abstract class Game {
         }
     }
 
+    /**
+     * @param playerMapView the playerMapView to set
+     */
+    public void setPlayerMapView(PlayerMapView playerMapView) {
+        this.playerMapView = playerMapView;
+    }
+
+    /**
+     * @param opponentMapView the opponentMapView to set
+     */
+    public void setOpponentMapView(OpponentMapView opponentMapView) {
+        this.opponentMapView = opponentMapView;
+    }
+
     enum State {
         DEPLOYMENT, BATTLE
     }
@@ -88,8 +114,8 @@ public abstract class Game {
     protected Map playerMap;
     protected Map opponentMap;
 
-    protected final PlayerMapView playerMapView;
-    protected final OpponentMapView opponentMapView;
+    protected PlayerMapView playerMapView;
+    protected OpponentMapView opponentMapView;
 
     protected Queue<Boolean> playerMoveQueue = new ConcurrentLinkedQueue<>();
     protected Queue<Boolean> opponentMoveQueue = new ConcurrentLinkedQueue<>();
