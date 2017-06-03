@@ -185,7 +185,7 @@ public abstract class Game {
                 }
             }
             opponentMapView.showHitsOnMap();
+            playerMapView.showShipsOnMap();
         }
-
     }
 }

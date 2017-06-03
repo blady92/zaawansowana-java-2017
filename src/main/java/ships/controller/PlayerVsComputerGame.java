@@ -1,6 +1,8 @@
 package ships.controller;
 
+import ships.exception.OutsideOfMapPlacementException;
 import ships.exception.ShipGameException;
+import ships.model.Field;
 import ships.model.FieldImpl;
 import ships.model.GameMap;
 import ships.model.Ship;
@@ -58,8 +60,18 @@ public class PlayerVsComputerGame extends Game {
 
     @Override
     protected Boolean opponentShooting() {
-        Logger.getLogger(Game.class.getName()).log(Level.INFO, "ping");
+        try {
+            Field f;
+            Random rand = new Random();
+            do {
+                f = playerMap.getField(rand.nextInt(GameMap.mapSize), rand.nextInt(GameMap.mapSize));
+            }
+            while(f.isAttacked());
+
+            return playerMap.shootAt(f);
+        } catch (OutsideOfMapPlacementException ex) {
+            Logger.getLogger(PlayerVsComputerGame.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return false;
     }
-
 }
