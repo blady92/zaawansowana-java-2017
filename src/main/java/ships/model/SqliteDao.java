@@ -2,6 +2,8 @@ package ships.model;
 
 import javax.security.auth.Destroyable;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SqliteDao implements Destroyable {
 
@@ -13,18 +15,11 @@ public class SqliteDao implements Destroyable {
         Statement statement = null;
         connection = connect();
         initializeTable();
-        statement = connection.createStatement();
-        resultSet = statement
-                .executeQuery("SELECT * FROM "+TABLE_NAME);
-        while (resultSet.next())
-        {
-            System.out.println("NICK:"
-                    + resultSet.getString("nickname"));
-        }
     }
 
     /**
      * Establishes connection to the database
+     *
      * @return
      * @throws ClassNotFoundException
      * @throws SQLException
@@ -45,14 +40,33 @@ public class SqliteDao implements Destroyable {
 
     /**
      * Sends score to the database
+     *
      * @param nickname
      * @param score
      * @throws java.sql.SQLException
      */
     public void addNewScore(String nickname, Integer score) throws SQLException {
-        String sqlCreate = "INSERT INTO "+TABLE_NAME+" VALUES ('"+nickname+"',"+score+")";
+        String sqlCreate = "INSERT INTO " + TABLE_NAME + " VALUES ('" + nickname + "'," + score + ")";
         Statement stmt = connection.createStatement();
         stmt.execute(sqlCreate);
     }
 
+    /**
+     * Get top scores to get
+     *
+     * @param number number of scores to get
+     * @return
+     */
+    public List<HighScore> getTopScores(int number) throws SQLException {
+        List<HighScore> result = new ArrayList<>();
+        ResultSet resultSet = null;
+        Statement statement = null;
+        statement = connection.createStatement();
+        resultSet = statement
+                .executeQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY score DESC LIMIT " + number + ";");
+        while (resultSet.next()) {
+            result.add(new HighScore(resultSet.getInt("score"), resultSet.getString("nickname")));
+        }
+        return result;
+    }
 }
