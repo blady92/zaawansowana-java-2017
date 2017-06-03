@@ -6,7 +6,6 @@ import ships.model.Field;
 import ships.model.FieldImpl;
 import ships.model.GameMap;
 import ships.model.Ship;
-import ships.view.MapView;
 import ships.view.OpponentMapView;
 import ships.view.PlayerMapView;
 
@@ -35,16 +34,6 @@ public class PlayerVsComputerGame extends Game {
     @Override
     public void stopPlacement() {
         playerMapView.stopPlacement();
-    }
-
-    @Override
-    public MapView getPlayerMapView() {
-        return this.playerMapView;
-    }
-
-    @Override
-    public MapView getOpponentMapView() {
-        return this.opponentMapView;
     }
 
     private void placeComputerShips() throws ShipGameException {

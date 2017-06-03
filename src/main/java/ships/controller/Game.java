@@ -49,12 +49,16 @@ public abstract class Game {
     /**
      * @return the playerMapView
      */
-    public abstract MapView getPlayerMapView();
+    public MapView getPlayerMapView() {
+        return this.playerMapView;
+    }
 
     /**
      * @return the opponentMapView
      */
-    public abstract MapView getOpponentMapView();
+    public MapView getOpponentMapView() {
+        return this.opponentMapView;
+    }
 
     /**
      * @return the playerMap
