@@ -1,13 +1,11 @@
 package ships.controller;
 
 import ships.exception.OutsideOfMapPlacementException;
-import ships.model.FieldImpl;
-import ships.model.GameMap;
-import ships.model.Map;
-import ships.model.Ship;
+import ships.model.*;
 import ships.view.*;
 
 import javax.swing.*;
+import java.sql.SQLException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -162,13 +160,30 @@ public abstract class Game {
                 }
             }
             if (playerMap.getScore() == 0) {
-                JOptionPane.showMessageDialog(null, "Przegrałeś!", "Koniec gry", JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Wygrałeś!", "Koniec gry", JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(null, "You lost!", "Game over", JOptionPane.ERROR_MESSAGE);
+            }
+            else {
+                String nickname = JOptionPane.showInputDialog(null, "Type your nickname to get to the high score list:", "You won!", JOptionPane.QUESTION_MESSAGE);
+                if (nickname != null) {
+                    try {
+                        sendScoreToServer(nickname, playerMap.getScore());
+                    } catch (ClassNotFoundException ex) {
+                        JOptionPane.showMessageDialog(null, "SQLite class not found. Contact the application vendor", "Error!", JOptionPane.ERROR_MESSAGE, null);
+                        Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "There was unexpected error during sending your score. Sorry", "Error!", JOptionPane.ERROR_MESSAGE, null);
+                        Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
             nextMove = NextMove.OPPONENT;
         }
     });
+
+    private void sendScoreToServer(String nickname, Integer score) throws ClassNotFoundException, SQLException {
+        SqliteDao dao = new SqliteDao();
+        dao.addNewScore(nickname, score);
+    }
 
     /**
      * Wait for player's move
