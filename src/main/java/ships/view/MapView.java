@@ -14,7 +14,12 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapView extends Canvas {
+public abstract class MapView extends Canvas {
+
+    public static final Color SHIP_COLOR = Color.GRAY;
+    public static final Color HIT_COLOR = Color.YELLOW;
+    public static final Color SUNK_COLOR = Color.BLACK;
+    public static final Color MISSED_COLOR = Color.LIGHT_GRAY;
 
     private Color backgroundColor = Color.WHITE;
     private final Integer mapSize = 10;

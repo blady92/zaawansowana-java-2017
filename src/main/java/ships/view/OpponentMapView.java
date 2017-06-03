@@ -5,6 +5,7 @@ import ships.exception.ShipNotFoundException;
 import ships.model.Field;
 import ships.model.GameMap;
 import ships.model.Map;
+import ships.model.MapChangeObserver;
 
 import java.awt.*;
 import java.util.logging.Level;
@@ -15,7 +16,7 @@ public class OpponentMapView extends MapView {
 
     public OpponentMapView(Map gameMap) {
         this.game = gameMap;
-        this.addFieldSelectObserver(new ClickObserver());
+        this.game.addMapChangeObserver(new ChangeObserver());
     }
 
     /**
@@ -44,18 +45,18 @@ public class OpponentMapView extends MapView {
                     Field f = game.getField(i, j);
                     if (f.isAttacked()) {
                         if (!f.isShipHere()) {
-                            fillField(i, j, Color.LIGHT_GRAY);
+                            fillField(i, j, MISSED_COLOR);
                             continue;
                         }
                         try {
                             if (game.getShipAtPosition(f).isSunken()) {
-                                fillField(i, j, Color.BLACK);
+                                fillField(i, j, SUNK_COLOR);
                                 continue;
                             }
                         } catch (ShipNotFoundException ex) {
                             /* intentionally do nothing */
                         }
-                        fillField(i, j, Color.YELLOW);
+                        fillField(i, j, HIT_COLOR);
                     }
                 } catch (OutsideOfMapPlacementException ex) {
                     Logger.getLogger(PlayerMapView.class.getName()).log(Level.SEVERE, null, ex);
@@ -64,14 +65,11 @@ public class OpponentMapView extends MapView {
         }
     }
 
-    private class ClickObserver implements MapClickObserver {
+    private class ChangeObserver implements MapChangeObserver {
 
         @Override
-        public void fieldClickedEvent(FieldSelectEvent fce, MapView bm) {
-            if (fce.getButton() == FieldSelectEventImpl.BUTTON1) {
-//                showShipsOnMap();
-//                showHitsOnMap();
-            }
+        public void mapChangedEvent() {
+            showHitsOnMap();
         }
     }
 }
