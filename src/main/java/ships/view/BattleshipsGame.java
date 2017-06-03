@@ -8,10 +8,15 @@ package ships.view;
 import ships.controller.Game;
 import ships.controller.PlayerVsComputerGame;
 import ships.exception.ShipGameException;
+import ships.model.HighScore;
+import ships.model.MapChangeObserver;
 import ships.model.Ship;
+import ships.model.SqliteDao;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +54,11 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 game = new PlayerVsComputerGame();
                 break;
             default:
+                /**
+                 * TODO:
+                 * dbunit
+                 * sqllite
+                 */
                 throw new RuntimeException("Unsupported game type");
         }
 
@@ -62,6 +72,10 @@ public class BattleshipsGame extends javax.swing.JFrame {
 
         //listen to click events to update non-gamefield interface
         game.getPlayerMapView().addFieldSelectObserver(new PlayerObserver());
+
+        //listen to any change in map's state
+        game.getPlayerMap().addMapChangeObserver(new ChangeObserver());
+        game.getOpponentMap().addMapChangeObserver(new ChangeObserver());
     }
 
     /**
@@ -83,6 +97,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
         threePicker = new javax.swing.JToggleButton();
         twoPicker = new javax.swing.JToggleButton();
         onePicker = new javax.swing.JToggleButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Battleships");
@@ -172,6 +187,13 @@ public class BattleshipsGame extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("High Scores");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -195,7 +217,8 @@ public class BattleshipsGame extends javax.swing.JFrame {
                                                         .addComponent(onePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(opponentScore, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                                .addGap(213, 213, 213)
+                                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -220,7 +243,9 @@ public class BattleshipsGame extends javax.swing.JFrame {
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addGap(0, 0, Short.MAX_VALUE)
-                                                                .addComponent(opponentScore))
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(opponentScore)
+                                                                        .addComponent(jButton1)))
                                                         .addGroup(layout.createSequentialGroup()
                                                                 .addComponent(playerScore)
                                                                 .addGap(0, 0, Short.MAX_VALUE))))
@@ -275,6 +300,22 @@ public class BattleshipsGame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_onePickerItemStateChanged
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            // TODO add your handling code here:
+            StringBuilder sb = new StringBuilder();
+            SqliteDao dao = new SqliteDao();
+            List<HighScore> scores = dao.getTopScores(10);
+            for (HighScore hs : scores) {
+                sb.append("<html><pre>").append(hs.getScore()).append("\t").append(hs.getNickname())/*.append("\n")*/;
+            }
+            JOptionPane.showMessageDialog(null, sb.toString(), "High Score", JOptionPane.INFORMATION_MESSAGE);
+        } catch (ClassNotFoundException | SQLException ex) {
+            JOptionPane.showMessageDialog(null, "There was an error while contacting the server!", "Error!", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(BattleshipsGame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -317,6 +358,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton fourPicker;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JToggleButton onePicker;
     private java.awt.Panel opponentPanel;
@@ -349,10 +391,6 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 onePicker.setVisible(false);
                 Logger.getLogger(PlayerMapView.class.getName()).log(Level.WARNING, "TODO: hide all pickers");
             }
-            if (game.isDeploymentFinished()) {
-                playerScore.setText(game.getPlayerScore().toString());
-                opponentScore.setText(game.getOpponentScore().toString());
-            }
         }
 
         /**
@@ -373,9 +411,16 @@ public class BattleshipsGame extends javax.swing.JFrame {
             }
             picker.setToolTipText("" + availableShips + " more available");
         }
-
-
     }
 
+    private class ChangeObserver implements MapChangeObserver {
 
+        @Override
+        public void mapChangedEvent() {
+            if (game.isDeploymentFinished()) {
+                playerScore.setText(game.getPlayerScore().toString());
+                opponentScore.setText(game.getOpponentScore().toString());
+            }
+        }
+    }
 }

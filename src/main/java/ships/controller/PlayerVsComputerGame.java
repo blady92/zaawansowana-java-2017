@@ -1,10 +1,13 @@
 package ships.controller;
 
+import ships.exception.OutsideOfMapPlacementException;
 import ships.exception.ShipGameException;
+import ships.model.Field;
 import ships.model.FieldImpl;
 import ships.model.GameMap;
 import ships.model.Ship;
-import ships.view.MapView;
+import ships.view.OpponentMapView;
+import ships.view.PlayerMapView;
 
 import java.util.Random;
 import java.util.logging.Level;
@@ -17,6 +20,12 @@ public class PlayerVsComputerGame extends Game {
         placeComputerShips();
     }
 
+    public PlayerVsComputerGame(PlayerMapView playerMapView, OpponentMapView opponentMapView) throws ShipGameException {
+        super(playerMapView, opponentMapView);
+
+        placeComputerShips();
+    }
+
     @Override
     public void startPlacement(Ship.Size size) {
         playerMapView.startPlacement(size);
@@ -25,16 +34,6 @@ public class PlayerVsComputerGame extends Game {
     @Override
     public void stopPlacement() {
         playerMapView.stopPlacement();
-    }
-
-    @Override
-    public MapView getPlayerMapView() {
-        return this.playerMapView;
-    }
-
-    @Override
-    public MapView getOpponentMapView() {
-        return this.opponentMapView;
     }
 
     private void placeComputerShips() throws ShipGameException {
@@ -58,8 +57,18 @@ public class PlayerVsComputerGame extends Game {
 
     @Override
     protected Boolean opponentShooting() {
-        Logger.getLogger(Game.class.getName()).log(Level.INFO, "ping");
+        try {
+            Field f;
+            Random rand = new Random();
+            do {
+                f = playerMap.getField(rand.nextInt(GameMap.mapSize), rand.nextInt(GameMap.mapSize));
+            }
+            while(f.isAttacked());
+
+            return playerMap.shootAt(f);
+        } catch (OutsideOfMapPlacementException ex) {
+            Logger.getLogger(PlayerVsComputerGame.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return false;
     }
-
 }

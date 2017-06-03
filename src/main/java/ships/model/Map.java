@@ -3,6 +3,7 @@ package ships.model;
 import ships.exception.CollidesWithAnotherShipException;
 import ships.exception.NoShipsAvailableException;
 import ships.exception.OutsideOfMapPlacementException;
+import ships.exception.ShipNotFoundException;
 
 import java.util.List;
 
@@ -62,4 +63,8 @@ public interface Map {
      * @return
      */
     int getScore();
+
+    Ship getShipAtPosition(Field position) throws ShipNotFoundException;
+
+    void addMapChangeObserver(MapChangeObserver o);
 }

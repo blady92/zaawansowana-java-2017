@@ -19,6 +19,8 @@ public class GameMap implements Map {
     private List<Ship> ships;
     private HashMap<Ship.Size, Integer> availableShips;
 
+    private List<MapChangeObserver> changeObservers;
+
     public GameMap() {
         map = new Field[mapSize][mapSize];
         availableShips = new HashMap<>();
@@ -33,6 +35,12 @@ public class GameMap implements Map {
                 map[i][j] = new FieldImpl(Field.State.EMPTY, i, j);
             }
         }
+
+        changeObservers = new ArrayList<>();
+    }
+
+    public void addMapChangeObserver(MapChangeObserver o) {
+        changeObservers.add(o);
     }
 
     /**
@@ -55,6 +63,9 @@ public class GameMap implements Map {
             throw new CollidesWithAnotherShipException(fields);
         }
         markPositionOnMap(ship);
+        for(MapChangeObserver o : changeObservers) {
+            o.mapChangedEvent();
+        }
     }
 
     /**
@@ -148,14 +159,23 @@ public class GameMap implements Map {
             for (Field f : fv) {
                 if (f.equals(position)) {
                     fieldToShoot = f;
-                    break;
+                    break;//FIXME: breaks only one for
                 }
             }
         }
         if (fieldToShoot == null) {
             throw new RuntimeException("Position [" + position.getRow() + "," + position.getCol() + "] not found!");
         }
-        return fieldToShoot.attack();
+        try {
+            this.getShipAtPosition(fieldToShoot).hitTheShip();
+        } catch (ShipNotFoundException ex) {
+            /* intentionally do nothing */
+        }
+        Boolean result = fieldToShoot.attack();
+        for(MapChangeObserver o : changeObservers) {
+            o.mapChangedEvent();
+        }
+        return result;
     }
 
     /**
@@ -267,9 +287,9 @@ public class GameMap implements Map {
             Integer cs = s.getPosition().getCol();
             Integer ce = s.getPosition().getCol();
             if (s.getDirection() == Ship.Direction.VERTICAL) {
-                re += s.getSize().getSize();
+                re += s.getSize().getSize() - 1;
             } else {
-                ce += s.getSize().getSize();
+                ce += s.getSize().getSize() - 1;
             }
             if (position.getRow() >= rs
                     && position.getRow() <= re

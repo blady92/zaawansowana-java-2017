@@ -13,3 +13,4 @@ zaawansowana-java-2017.iml
 hs_err_pid*
 /target/
 nbactions.xml
+*.db

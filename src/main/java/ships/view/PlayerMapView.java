@@ -3,6 +3,7 @@ package ships.view;
 import ships.exception.CollidesWithAnotherShipException;
 import ships.exception.NoShipsAvailableException;
 import ships.exception.OutsideOfMapPlacementException;
+import ships.exception.ShipNotFoundException;
 import ships.model.*;
 
 import java.awt.*;
@@ -16,17 +17,36 @@ public class PlayerMapView extends MapView {
     public PlayerMapView(Map gameMap) {
         this.game = gameMap;
         this.addFieldSelectObserver(mco);
+        this.game.addMapChangeObserver(new ChangeObserver());
     }
 
-    private void showShipsOnMap() {
+    public void showShipsOnMap() {
+        //TODO: create map observer that will execute this every time game map state changes
         for (int i = 0; i < GameMap.mapSize; i++) {
             for (int j = 0; j < GameMap.mapSize; j++) {
-                if (game.getField(i, j).isShipHere()) {
-                    try {
-                        fillField(i, j, Color.GRAY);
-                    } catch (OutsideOfMapPlacementException ex) {
-                        Logger.getLogger(PlayerMapView.class.getName()).log(Level.SEVERE, null, ex);
+                Field f = game.getField(i, j);
+                try {
+                    if (f.isShipHere()) {
+                        try {
+                            if (game.getShipAtPosition(f).isSunken()) {
+                                fillField(i, j, SUNK_COLOR);
+                                continue;
+                            }
+                        } catch (ShipNotFoundException ex) {
+                                /* intentionally do nothing */
+                        }
+                        if (f.isAttacked()) {
+                            fillField(i, j, HIT_COLOR);
+                            continue;
+                        }
+                        fillField(i, j, SHIP_COLOR);
+                        continue;
                     }
+                    if (f.isAttacked()) {
+                        fillField(i, j, MISSED_COLOR);
+                    }
+                } catch (OutsideOfMapPlacementException ex) {
+                    Logger.getLogger(PlayerMapView.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -53,12 +73,12 @@ public class PlayerMapView extends MapView {
                 }
                 if (fce.getButton() == FieldSelectEventImpl.NOBUTTON) {
                     //move
+                    showShipsOnMap();
                     bm.clearAllFields(Color.GREEN);
                     bm.clearAllFields(Color.RED);
                     if (!mode.isActive()) {
                         return;
                     }
-                    showShipsOnMap();
                     Ship ship = new Ship(
                             mode.getSize(),
                             new FieldImpl(fce.getRow(), fce.getCol()),
@@ -94,7 +114,6 @@ public class PlayerMapView extends MapView {
                 Ship ship = new Ship(mode.getSize(), new FieldImpl(fce.getRow(), fce.getCol()), mode.getDir());
                 if (mode.isActive() && game.isAbleToPlaceShip(ship).isEmpty()) {
                     game.placeShip(ship);
-                    showShipsOnMap();
                     stopPlacement();
                 }
             } catch (OutsideOfMapPlacementException ex) {
@@ -102,6 +121,13 @@ public class PlayerMapView extends MapView {
             } catch (CollidesWithAnotherShipException | NoShipsAvailableException ex) {
                 Logger.getLogger(PlayerMapView.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+
+    private class ChangeObserver implements MapChangeObserver {
+        @Override
+        public void mapChangedEvent() {
+            showShipsOnMap();
         }
     }
 }

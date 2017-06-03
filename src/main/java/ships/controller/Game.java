@@ -1,12 +1,11 @@
 package ships.controller;
 
 import ships.exception.OutsideOfMapPlacementException;
-import ships.model.FieldImpl;
-import ships.model.GameMap;
-import ships.model.Map;
-import ships.model.Ship;
+import ships.model.*;
 import ships.view.*;
 
+import javax.swing.*;
+import java.sql.SQLException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -21,7 +20,19 @@ public abstract class Game {
         this.opponentMap = new GameMap();
 
         this.playerMapView = new PlayerMapView(playerMap);
-        this.opponentMapView = new OpponentMapView();
+        this.opponentMapView = new OpponentMapView(opponentMap);
+
+        this.opponentMapView.addFieldSelectObserver(new ClickObserver());
+    }
+
+    public Game(PlayerMapView playerMapView, OpponentMapView opponentMapView) {
+        this.state = State.DEPLOYMENT;
+
+        this.playerMap = new GameMap();
+        this.opponentMap = new GameMap();
+
+        this.playerMapView = playerMapView;
+        this.opponentMapView = opponentMapView;
 
         this.opponentMapView.addFieldSelectObserver(new ClickObserver());
     }
@@ -36,12 +47,16 @@ public abstract class Game {
     /**
      * @return the playerMapView
      */
-    public abstract MapView getPlayerMapView();
+    public MapView getPlayerMapView() {
+        return this.playerMapView;
+    }
 
     /**
      * @return the opponentMapView
      */
-    public abstract MapView getOpponentMapView();
+    public MapView getOpponentMapView() {
+        return this.opponentMapView;
+    }
 
     /**
      * @return the playerMap
@@ -73,6 +88,20 @@ public abstract class Game {
         }
     }
 
+    /**
+     * @param playerMapView the playerMapView to set
+     */
+    public void setPlayerMapView(PlayerMapView playerMapView) {
+        this.playerMapView = playerMapView;
+    }
+
+    /**
+     * @param opponentMapView the opponentMapView to set
+     */
+    public void setOpponentMapView(OpponentMapView opponentMapView) {
+        this.opponentMapView = opponentMapView;
+    }
+
     enum State {
         DEPLOYMENT, BATTLE
     }
@@ -87,8 +116,8 @@ public abstract class Game {
     protected Map playerMap;
     protected Map opponentMap;
 
-    protected final PlayerMapView playerMapView;
-    protected final OpponentMapView opponentMapView;
+    protected PlayerMapView playerMapView;
+    protected OpponentMapView opponentMapView;
 
     protected Queue<Boolean> playerMoveQueue = new ConcurrentLinkedQueue<>();
     protected Queue<Boolean> opponentMoveQueue = new ConcurrentLinkedQueue<>();
@@ -130,8 +159,31 @@ public abstract class Game {
                     }
                 }
             }
+            if (playerMap.getScore() == 0) {
+                JOptionPane.showMessageDialog(null, "You lost!", "Game over", JOptionPane.ERROR_MESSAGE);
+            }
+            else {
+                String nickname = JOptionPane.showInputDialog(null, "Type your nickname to get to the high score list:", "You won!", JOptionPane.QUESTION_MESSAGE);
+                if (nickname != null) {
+                    try {
+                        sendScoreToServer(nickname, playerMap.getScore());
+                    } catch (ClassNotFoundException ex) {
+                        JOptionPane.showMessageDialog(null, "SQLite class not found. Contact the application vendor", "Error!", JOptionPane.ERROR_MESSAGE, null);
+                        Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "There was unexpected error during sending your score. Sorry", "Error!", JOptionPane.ERROR_MESSAGE, null);
+                        Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            nextMove = NextMove.OPPONENT;
         }
     });
+
+    private void sendScoreToServer(String nickname, Integer score) throws ClassNotFoundException, SQLException {
+        SqliteDao dao = new SqliteDao();
+        dao.addNewScore(nickname, score);
+    }
 
     /**
      * Wait for player's move
@@ -181,8 +233,8 @@ public abstract class Game {
                     Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-
+            opponentMapView.showHitsOnMap();
+            playerMapView.showShipsOnMap();
         }
-
     }
 }
