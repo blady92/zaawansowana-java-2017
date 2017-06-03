@@ -7,6 +7,7 @@ import ships.model.Map;
 import ships.model.Ship;
 import ships.view.*;
 
+import javax.swing.*;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -21,7 +22,7 @@ public abstract class Game {
         this.opponentMap = new GameMap();
 
         this.playerMapView = new PlayerMapView(playerMap);
-        this.opponentMapView = new OpponentMapView();
+        this.opponentMapView = new OpponentMapView(opponentMap);
 
         this.opponentMapView.addFieldSelectObserver(new ClickObserver());
     }
@@ -130,6 +131,8 @@ public abstract class Game {
                     }
                 }
             }
+            JOptionPane.showMessageDialog(null, "Wiktoria!", "Ktoś wygrał grę", JOptionPane.INFORMATION_MESSAGE);
+            nextMove = NextMove.OPPONENT;
         }
     });
 
@@ -181,7 +184,7 @@ public abstract class Game {
                     Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-
+            opponentMapView.showHitsOnMap();
         }
 
     }

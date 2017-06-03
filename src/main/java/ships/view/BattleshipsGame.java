@@ -350,6 +350,7 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 Logger.getLogger(PlayerMapView.class.getName()).log(Level.WARNING, "TODO: hide all pickers");
             }
             if (game.isDeploymentFinished()) {
+                Logger.getLogger(PlayerMapView.class.getName()).log(Level.WARNING, "FIXME: not working!");
                 playerScore.setText(game.getPlayerScore().toString());
                 opponentScore.setText(game.getOpponentScore().toString());
             }

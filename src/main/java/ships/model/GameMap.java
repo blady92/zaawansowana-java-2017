@@ -155,6 +155,11 @@ public class GameMap implements Map {
         if (fieldToShoot == null) {
             throw new RuntimeException("Position [" + position.getRow() + "," + position.getCol() + "] not found!");
         }
+        try {
+            this.getShipAtPosition(fieldToShoot).hitTheShip();
+        } catch (ShipNotFoundException ex) {
+            /* intentionally do nothing */
+        }
         return fieldToShoot.attack();
     }
 
@@ -267,9 +272,9 @@ public class GameMap implements Map {
             Integer cs = s.getPosition().getCol();
             Integer ce = s.getPosition().getCol();
             if (s.getDirection() == Ship.Direction.VERTICAL) {
-                re += s.getSize().getSize();
+                re += s.getSize().getSize() - 1;
             } else {
-                ce += s.getSize().getSize();
+                ce += s.getSize().getSize() - 1;
             }
             if (position.getRow() >= rs
                     && position.getRow() <= re
