@@ -65,4 +65,6 @@ public interface Map {
     int getScore();
 
     Ship getShipAtPosition(Field position) throws ShipNotFoundException;
+
+    void addMapChangeObserver(MapChangeObserver o);
 }

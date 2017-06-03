@@ -8,6 +8,7 @@ package ships.view;
 import ships.controller.Game;
 import ships.controller.PlayerVsComputerGame;
 import ships.exception.ShipGameException;
+import ships.model.MapChangeObserver;
 import ships.model.Ship;
 
 import javax.swing.*;
@@ -62,6 +63,10 @@ public class BattleshipsGame extends javax.swing.JFrame {
 
         //listen to click events to update non-gamefield interface
         game.getPlayerMapView().addFieldSelectObserver(new PlayerObserver());
+
+        //listen to any change in map's state
+        game.getPlayerMap().addMapChangeObserver(new ChangeObserver());
+        game.getOpponentMap().addMapChangeObserver(new ChangeObserver());
     }
 
     /**
@@ -349,11 +354,6 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 onePicker.setVisible(false);
                 Logger.getLogger(PlayerMapView.class.getName()).log(Level.WARNING, "TODO: hide all pickers");
             }
-            if (game.isDeploymentFinished()) {
-                Logger.getLogger(PlayerMapView.class.getName()).log(Level.WARNING, "FIXME: not working!");
-                playerScore.setText(game.getPlayerScore().toString());
-                opponentScore.setText(game.getOpponentScore().toString());
-            }
         }
 
         /**
@@ -374,9 +374,16 @@ public class BattleshipsGame extends javax.swing.JFrame {
             }
             picker.setToolTipText("" + availableShips + " more available");
         }
-
-
     }
 
+    private class ChangeObserver implements MapChangeObserver {
 
+        @Override
+        public void mapChangedEvent() {
+            if (game.isDeploymentFinished()) {
+                playerScore.setText(game.getPlayerScore().toString());
+                opponentScore.setText(game.getOpponentScore().toString());
+            }
+        }
+    }
 }

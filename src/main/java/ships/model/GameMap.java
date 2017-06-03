@@ -19,6 +19,8 @@ public class GameMap implements Map {
     private List<Ship> ships;
     private HashMap<Ship.Size, Integer> availableShips;
 
+    private List<MapChangeObserver> changeObservers;
+
     public GameMap() {
         map = new Field[mapSize][mapSize];
         availableShips = new HashMap<>();
@@ -33,6 +35,12 @@ public class GameMap implements Map {
                 map[i][j] = new FieldImpl(Field.State.EMPTY, i, j);
             }
         }
+
+        changeObservers = new ArrayList<>();
+    }
+
+    public void addMapChangeObserver(MapChangeObserver o) {
+        changeObservers.add(o);
     }
 
     /**
@@ -55,6 +63,9 @@ public class GameMap implements Map {
             throw new CollidesWithAnotherShipException(fields);
         }
         markPositionOnMap(ship);
+        for(MapChangeObserver o : changeObservers) {
+            o.mapChangedEvent();
+        }
     }
 
     /**
@@ -160,7 +171,11 @@ public class GameMap implements Map {
         } catch (ShipNotFoundException ex) {
             /* intentionally do nothing */
         }
-        return fieldToShoot.attack();
+        Boolean result = fieldToShoot.attack();
+        for(MapChangeObserver o : changeObservers) {
+            o.mapChangedEvent();
+        }
+        return result;
     }
 
     /**
