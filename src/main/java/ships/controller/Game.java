@@ -131,7 +131,11 @@ public abstract class Game {
                     }
                 }
             }
-            JOptionPane.showMessageDialog(null, "Wiktoria!", "Ktoś wygrał grę", JOptionPane.INFORMATION_MESSAGE);
+            if (playerMap.getScore() == 0) {
+                JOptionPane.showMessageDialog(null, "Przegrałeś!", "Koniec gry", JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Wygrałeś!", "Koniec gry", JOptionPane.PLAIN_MESSAGE);
+            }
             nextMove = NextMove.OPPONENT;
         }
     });

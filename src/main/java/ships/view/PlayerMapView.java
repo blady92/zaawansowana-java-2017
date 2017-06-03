@@ -73,6 +73,7 @@ public class PlayerMapView extends MapView {
                 }
                 if (fce.getButton() == FieldSelectEventImpl.NOBUTTON) {
                     //move
+                    showShipsOnMap();
                     bm.clearAllFields(Color.GREEN);
                     bm.clearAllFields(Color.RED);
                     if (!mode.isActive()) {
