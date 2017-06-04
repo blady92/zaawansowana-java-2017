@@ -119,8 +119,8 @@ public abstract class Game {
     protected PlayerMapView playerMapView;
     protected OpponentMapView opponentMapView;
 
-    protected Queue<Boolean> playerMoveQueue = new ConcurrentLinkedQueue<>();
-    protected Queue<Boolean> opponentMoveQueue = new ConcurrentLinkedQueue<>();
+    protected Queue<Field> playerMoveQueue = new ConcurrentLinkedQueue<>();
+    protected Queue<Field> opponentMoveQueue = new ConcurrentLinkedQueue<>();
 
     public boolean isDeploymentFinished() {
         return getState() != State.DEPLOYMENT;
@@ -161,8 +161,7 @@ public abstract class Game {
             }
             if (playerMap.getScore() == 0) {
                 JOptionPane.showMessageDialog(null, "You lost!", "Game over", JOptionPane.ERROR_MESSAGE);
-            }
-            else {
+            } else {
                 String nickname = JOptionPane.showInputDialog(null, "Type your nickname to get to the high score list:", "You won!", JOptionPane.QUESTION_MESSAGE);
                 if (nickname != null) {
                     try {
@@ -194,7 +193,7 @@ public abstract class Game {
         while (playerMoveQueue.isEmpty()) {
             //wait until player performs a move
         }
-        return playerMoveQueue.remove();
+        return playerMoveQueue.remove().isAttacked();
     }
 
     /**
@@ -203,7 +202,6 @@ public abstract class Game {
      * @return <b>true</b> if enemy hit player's ship, <b>false</b> otherwise
      */
     protected abstract Boolean opponentShooting();
-
 
     private class ClickObserver implements MapClickObserver {
 
@@ -214,11 +212,9 @@ public abstract class Game {
                 return;
             }
 
-            if (
-                    getState() != State.BATTLE &&
-                            playerMap.isDeploymentFinished() &&
-                            opponentMap.isDeploymentFinished()
-                    ) {
+            if (getState() != State.BATTLE
+                    && playerMap.isDeploymentFinished()
+                    && opponentMap.isDeploymentFinished()) {
                 setState(State.BATTLE);
             }
 
@@ -227,8 +223,12 @@ public abstract class Game {
                     if (opponentMap.getField(fce.getRow(), fce.getCol()).isAttacked()) {
                         return;
                     }
-                    Boolean result = opponentMap.shootAt(new FieldImpl(fce.getRow(), fce.getCol()));
-                    playerMoveQueue.add(result);
+                    Field f = new FieldImpl(fce.getRow(), fce.getCol());
+                    Boolean result = opponentMap.shootAt(f);
+                    if (result) {
+                        f.attack();
+                    }
+                    playerMoveQueue.add(f);
                 } catch (OutsideOfMapPlacementException ex) {
                     Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
                 }
