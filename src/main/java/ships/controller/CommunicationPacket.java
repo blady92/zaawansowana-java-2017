@@ -5,14 +5,10 @@
  */
 package ships.controller;
 
-import ships.model.Field;
-
 /**
  *
  * @author r4pt0r
  */
-public class CommunicationPacket {
-    
-    Field field;
-    
+public abstract class CommunicationPacket {
+
 }
