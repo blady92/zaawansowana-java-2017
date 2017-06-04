@@ -1,6 +1,8 @@
 package ships.model;
 
 import java.util.Objects;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  * @author Mateusz Kozlowski
@@ -9,7 +11,8 @@ public class FieldImpl implements Field {
 
     private Boolean attacked;
     private State state;
-    private int row, col;
+    @JsonProperty("row") private int row;
+    @JsonProperty("col") private int col;
 
     public FieldImpl(State state, int row, int col) {
         this.state = state;
@@ -18,7 +21,9 @@ public class FieldImpl implements Field {
         this.attacked = Boolean.FALSE;
     }
 
-    public FieldImpl(int row, int col) {
+    @JsonCreator
+    public FieldImpl(
+            @JsonProperty("row") int row, @JsonProperty("col") int col) {
         this.state = State.EMPTY;
         this.row = row;
         this.col = col;
