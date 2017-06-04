@@ -22,6 +22,7 @@ public class TCPClientConnection extends Connection {
     }
 
     public TCPClientConnection(Socket socket) {
+        super();
         this.sock = socket;
     }
 

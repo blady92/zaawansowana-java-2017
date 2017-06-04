@@ -9,6 +9,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import ships.model.Field;
 import ships.model.FieldImpl;
+import ships.model.Ship;
 
 /**
  *
@@ -57,28 +60,41 @@ public class TCPClientConnectionTest {
     @Test
     public void shouldSendAndReceiveMovePacket() throws IOException {
         //given
-        String expected = "{"
-                + "\"field\":["
-                + "\"ships.model.FieldImpl\",{"
-                + "\"attacked\":false,"
-                + "\"state\":\"EMPTY\","
-                + "\"row\":1,\"col\":2," + "\"shipHere\":false"
-                + "}]}";
         Field f = new FieldImpl(1, 2);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteArrayInputStream bais;
         when(sock.getOutputStream()).thenReturn(baos);
-        when(sock.getInputStream()).thenReturn(null);
         MovePacket mp = new MovePacket(new FieldImpl(1, 2));
         //when
         sut.sendPacket(mp);
         String s = baos.toString();/////////////////////////////////////////////
-//        bais = new ByteArrayInputStream(baos.toByteArray());
-//        MovePacket packet = (MovePacket) sut.receivePacket();
-//        Field receivedField = packet.getField();
+        bais = new ByteArrayInputStream(baos.toByteArray());
+        when(sock.getInputStream()).thenReturn(bais);
+        MovePacket packet = (MovePacket) sut.receivePacket();
+        Field receivedField = packet.getField();
         //then
-        assertEquals(expected, s);
-//        assertEquals(f, receivedField);
+        assertEquals(f, receivedField);
+    }
+
+    @Test
+    public void shouldSendAndReceiveMapPacket() throws IOException {
+        //given
+        List<Ship> ships = new ArrayList<>();
+        ships.add(new Ship(Ship.Size.FOUR, new FieldImpl(1, 2),
+                Ship.Direction.VERTICAL));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayInputStream bais;
+        when(sock.getOutputStream()).thenReturn(baos);
+        MapPacket packet = new MapPacket(ships);
+        //when
+        sut.sendPacket(packet);
+        String s = baos.toString();/////////////////////////////////////////////
+        bais = new ByteArrayInputStream(baos.toByteArray());
+        when(sock.getInputStream()).thenReturn(bais);
+        MapPacket received = (MapPacket) sut.receivePacket();
+        List<Ship> receivedShips = packet.getShips();
+        //then
+        assertEquals(ships, receivedShips);
     }
 
 }
