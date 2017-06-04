@@ -5,13 +5,14 @@
  */
 package ships.controller;
 
+import ships.model.Field;
 import ships.model.Ship;
 
 /**
  *
  * @author r4pt0r
  */
-public class PlayerJoinedGame extends Game {
+public class PlayerGuestedGame extends Game {
 
     @Override
     public void startPlacement(Ship.Size size) {
@@ -25,16 +26,18 @@ public class PlayerJoinedGame extends Game {
 
     @Override
     protected Boolean playerShooting() {
-        while(playerMoveQueue.isEmpty()) {
+        while (playerMoveQueue.isEmpty()) {
             //wait until player performs a move
         }
+        Field f = playerMoveQueue.remove();
+        CommunicationPacket packet = new MovePacket(f);
         throw new UnsupportedOperationException("TODO: send the move to server");
-        //return playerMoveQueue.remove();
+        //return f.isAttacked();
     }
 
     @Override
     protected Boolean opponentShooting() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
 }
