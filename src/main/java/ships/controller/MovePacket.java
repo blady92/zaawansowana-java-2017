@@ -5,6 +5,8 @@
  */
 package ships.controller;
 
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 import ships.model.Field;
 
 /**
@@ -13,9 +15,10 @@ import ships.model.Field;
  */
 public class MovePacket extends CommunicationPacket {
 
-    protected Field field;
+    @JsonProperty("field") protected Field field;
 
-    public MovePacket(Field f) {
+    @JsonCreator
+    public MovePacket(@JsonProperty("field") Field f) {
         this.field = f;
     }
 

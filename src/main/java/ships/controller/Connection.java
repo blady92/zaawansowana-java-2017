@@ -20,7 +20,7 @@ public abstract class Connection {
 
     public Connection() {
         mapper = new ObjectMapper();
-        mapper.enableDefaultTyping();
+        //mapper.enableDefaultTyping();
     }
 
     /**

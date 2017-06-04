@@ -2,10 +2,14 @@ package ships.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  * @author Mateusz Kozlowski
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Ship {
 
     /**
@@ -47,9 +51,15 @@ public class Ship {
         HORIZONTAL, VERTICAL
     }
 
+    @JsonProperty("shipSize")
     private Size size;
+
+    @JsonProperty("startPos")
     private Field position;
+
+    @JsonProperty("direction")
     private Direction direction;
+
     private Integer lives;
 
     /**
@@ -57,7 +67,12 @@ public class Ship {
      * @param startPosition
      * @param direction     <b>true</b> if vertical, <b>false</b> otherwise
      */
-    public Ship(Size shipSize, Field startPosition, Direction direction) {
+    @JsonCreator
+    public Ship(
+            @JsonProperty("shipSize") Size shipSize,
+            @JsonProperty("startPos") Field startPosition,
+            @JsonProperty("direction") Direction direction
+    ) {
         this.size = shipSize;
         this.position = startPosition;
         this.direction = direction;

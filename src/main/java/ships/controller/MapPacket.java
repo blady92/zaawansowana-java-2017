@@ -6,6 +6,8 @@
 package ships.controller;
 
 import java.util.List;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 import ships.model.Ship;
 
 /**
@@ -14,9 +16,11 @@ import ships.model.Ship;
  */
 public class MapPacket extends CommunicationPacket {
 
+    @JsonProperty("ships")
     protected List<Ship> ships;
 
-    public MapPacket(List<Ship> ships) {
+    @JsonCreator
+    public MapPacket(@JsonProperty("ships") List<Ship> ships) {
         this.ships = ships;
     }
 
