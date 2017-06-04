@@ -67,4 +67,6 @@ public interface Map {
     Ship getShipAtPosition(Field position) throws ShipNotFoundException;
 
     void addMapChangeObserver(MapChangeObserver o);
+
+    public List<Ship> getShips();
 }
