@@ -5,7 +5,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqliteDao implements Destroyable {
+public class SqliteDao {
 
     Connection connection = null;
     private final static String TABLE_NAME = "HighScores";
@@ -17,9 +17,14 @@ public class SqliteDao implements Destroyable {
         initializeTable();
     }
 
+    public SqliteDao(Connection connection) throws SQLException {
+        ResultSet resultSet = null;
+        Statement statement = null;
+        this.connection = connection;
+    }
+
     /**
      * Establishes connection to the database
-     *
      * @return
      * @throws ClassNotFoundException
      * @throws SQLException
@@ -29,7 +34,7 @@ public class SqliteDao implements Destroyable {
         return DriverManager.getConnection("jdbc:sqlite:highscores.db");
     }
 
-    private void initializeTable() throws SQLException {
+    public void initializeTable() throws SQLException {
         String sqlCreate = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME
                 + "  (nickname           VARCHAR(32),"
                 + "   score INTEGER)";
@@ -40,20 +45,18 @@ public class SqliteDao implements Destroyable {
 
     /**
      * Sends score to the database
-     *
      * @param nickname
      * @param score
      * @throws java.sql.SQLException
      */
     public void addNewScore(String nickname, Integer score) throws SQLException {
-        String sqlCreate = "INSERT INTO " + TABLE_NAME + " VALUES ('" + nickname + "'," + score + ")";
+        String sqlCreate = "INSERT INTO "+TABLE_NAME+" VALUES ('"+nickname+"',"+score+")";
         Statement stmt = connection.createStatement();
         stmt.execute(sqlCreate);
     }
 
     /**
      * Get top scores to get
-     *
      * @param number number of scores to get
      * @return
      */
@@ -63,8 +66,9 @@ public class SqliteDao implements Destroyable {
         Statement statement = null;
         statement = connection.createStatement();
         resultSet = statement
-                .executeQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY score DESC LIMIT " + number + ";");
-        while (resultSet.next()) {
+                .executeQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY score DESC LIMIT "+number+";");
+        while (resultSet.next())
+        {
             result.add(new HighScore(resultSet.getInt("score"), resultSet.getString("nickname")));
         }
         return result;
