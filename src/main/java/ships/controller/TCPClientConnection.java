@@ -32,6 +32,8 @@ public class TCPClientConnection extends Connection {
     private Map playerMap;
     private Map opponentMap;
 
+    private boolean mapSent = false;
+
     public TCPClientConnection(
             String ipAddress, Integer port,
             Queue<Field> playerMoveQueue, final Queue<Field> opponentMoveQueue,
@@ -64,11 +66,12 @@ public class TCPClientConnection extends Connection {
 
         @Override
         public void run() {
-            while(sock.isConnected()) {
+            while(sock.isConnected() && ! mapSent) {
                 //check if we have something to send
                 if (playerMap.isDeploymentFinished()) {
                     try {
                         sendPacket(new MapPacket(playerMap.getShips()));
+                        mapSent = true;
                     } catch (IOException ex) {
                         Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -109,5 +112,4 @@ public class TCPClientConnection extends Connection {
             }
         }
     }
-
 }

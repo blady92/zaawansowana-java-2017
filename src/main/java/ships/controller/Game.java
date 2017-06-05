@@ -221,7 +221,6 @@ public abstract class Game {
 
             if (state == State.DEPLOYMENT && playerMap.isDeploymentFinished()) {
                 setState(State.WAITING);
-                return;
             }
 
             if (
@@ -230,6 +229,9 @@ public abstract class Game {
                             opponentMap.isDeploymentFinished()
                     ) {
                 setState(State.BATTLE);
+            }
+
+            if (getState() != State.BATTLE) {
                 return;
             }
 
@@ -251,5 +253,6 @@ public abstract class Game {
             opponentMapView.showHitsOnMap();
             playerMapView.showShipsOnMap();
         }
+
     };
 }
