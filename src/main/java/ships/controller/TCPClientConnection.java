@@ -76,6 +76,13 @@ public class TCPClientConnection extends Connection {
                         Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+                if (!playerMoveQueue.isEmpty()) {
+                    try {
+                        sendPacket(new MovePacket(playerMoveQueue.remove()));
+                    } catch (IOException ex) {
+                        Logger.getLogger(TCPClientConnection.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
                 //receive
                 try {
                     if (is.available() == 0) {

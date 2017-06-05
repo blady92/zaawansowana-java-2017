@@ -7,6 +7,8 @@ package ships.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,11 +26,12 @@ import ships.view.PlayerMapView;
 public class PlayerGuestedGame extends Game {
 
     private Connection conn;
+    protected Queue<Field> playerMoveQueueForRemote = new ConcurrentLinkedQueue<>();
 
     public PlayerGuestedGame(String ipAddress, Integer port) throws IOException {
         super();
 
-        conn = new TCPClientConnection(ipAddress, port, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
+        conn = new TCPClientConnection(ipAddress, port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
     }
 
     public PlayerGuestedGame(
@@ -69,5 +72,4 @@ public class PlayerGuestedGame extends Game {
         }
         throw new UnsupportedOperationException("TODO");
     }
-
 }

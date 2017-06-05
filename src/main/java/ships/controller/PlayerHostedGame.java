@@ -14,6 +14,8 @@ import ships.view.PlayerMapView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,7 @@ import java.util.logging.Logger;
 public class PlayerHostedGame extends Game {
 
     private Connection conn;
+    protected Queue<Field> playerMoveQueueForRemote = new ConcurrentLinkedQueue<>();
 
     public PlayerHostedGame(final Integer port) throws IOException {
         super();
@@ -34,7 +37,7 @@ public class PlayerHostedGame extends Game {
             @Override
             public void run() {
                 try {
-                    conn = new TCPServerConnection(port, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
+                    conn = new TCPServerConnection(port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
                     setState(State.DEPLOYMENT);
                 } catch (IOException ex) {
                     Logger.getLogger(PlayerHostedGame.class.getName()).log(Level.SEVERE, null, ex);
@@ -61,6 +64,7 @@ public class PlayerHostedGame extends Game {
             }
             Field f = playerMoveQueue.remove();
             opponentMap.shootAt(f);
+            playerMoveQueueForRemote.add(f);
             return f.isAttacked();
         } catch (OutsideOfMapPlacementException ex) {
             Logger.getLogger(PlayerGuestedGame.class.getName()).log(Level.SEVERE, null, ex);
