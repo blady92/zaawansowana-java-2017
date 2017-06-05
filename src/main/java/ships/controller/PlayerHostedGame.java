@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 public class PlayerHostedGame extends Game {
 
     private Connection conn;
-    protected Queue<Field> playerMoveQueueForRemote = new ConcurrentLinkedQueue<>();
+    protected volatile Queue<Field> playerMoveQueueForRemote = new ConcurrentLinkedQueue<>();
 
     public PlayerHostedGame(final Integer port) throws IOException {
         super();

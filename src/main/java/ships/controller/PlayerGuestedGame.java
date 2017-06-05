@@ -26,7 +26,7 @@ import ships.view.PlayerMapView;
 public class PlayerGuestedGame extends Game {
 
     private Connection conn;
-    protected Queue<Field> playerMoveQueueForRemote = new ConcurrentLinkedQueue<>();
+    protected volatile Queue<Field> playerMoveQueueForRemote = new ConcurrentLinkedQueue<>();
 
     public PlayerGuestedGame(String ipAddress, Integer port) throws IOException {
         super();
@@ -73,5 +73,4 @@ public class PlayerGuestedGame extends Game {
         }
         throw new UnsupportedOperationException("TODO");
     }
-
 }

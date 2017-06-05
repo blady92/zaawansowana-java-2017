@@ -123,8 +123,8 @@ public abstract class Game {
     protected PlayerMapView playerMapView;
     protected OpponentMapView opponentMapView;
 
-    protected Queue<Field> playerMoveQueue = new ConcurrentLinkedQueue<>();
-    protected Queue<Field> opponentMoveQueue = new ConcurrentLinkedQueue<>();
+    protected volatile Queue<Field> playerMoveQueue = new ConcurrentLinkedQueue<>();
+    protected volatile Queue<Field> opponentMoveQueue = new ConcurrentLinkedQueue<>();
 
     public boolean isDeploymentFinished() {
         return getState() != State.DEPLOYMENT;
@@ -215,14 +215,6 @@ public abstract class Game {
         @Override
         public void fieldClickedEvent(FieldSelectEvent fce, MapView bm) {
 
-            if (fce.getButton() != FieldSelectEventImpl.BUTTON1) {
-                return;
-            }
-
-            if (state == State.DEPLOYMENT && playerMap.isDeploymentFinished()) {
-                setState(State.WAITING);
-            }
-
             if (
                     getState() != State.BATTLE &&
                             playerMap.isDeploymentFinished() &&
@@ -230,6 +222,14 @@ public abstract class Game {
                     ) {
                 setState(State.BATTLE);
             }
+
+            if (fce.getButton() != FieldSelectEventImpl.BUTTON1) {
+                return;
+            }
+
+            /*if (state == State.DEPLOYMENT && playerMap.isDeploymentFinished()) {
+                setState(State.WAITING);
+            }*/
 
             if (getState() != State.BATTLE) {
                 return;
