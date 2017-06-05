@@ -40,7 +40,7 @@ public abstract class Game {
     /**
      * @return the state
      */
-    protected State getState() {
+    public State getState() {
         return state;
     }
 
@@ -75,7 +75,6 @@ public abstract class Game {
     }
 
     public abstract void startPlacement(Ship.Size size);
-
     public abstract void stopPlacement();
 
     /**
@@ -102,15 +101,15 @@ public abstract class Game {
         this.opponentMapView = opponentMapView;
     }
 
-    enum State {
-        DEPLOYMENT, BATTLE
+    public enum State {
+        CONNECTING, DEPLOYMENT, BATTLE
     }
 
     enum NextMove {
         PLAYER, OPPONENT
     }
 
-    protected State state = State.DEPLOYMENT;
+    public State state = State.DEPLOYMENT;
     protected NextMove nextMove = NextMove.PLAYER;
 
     protected Map playerMap;
@@ -142,26 +141,30 @@ public abstract class Game {
 
         @Override
         public void run() {
-            while (playerMap.getScore() > 0 && opponentMap.getScore() > 0) {
+            while(playerMap.getScore() > 0 && opponentMap.getScore() > 0) {
                 if (nextMove == NextMove.PLAYER) {
                     boolean isHit = playerShooting();
                     if (isHit) {
                         nextMove = NextMove.PLAYER;
-                    } else {
+                    }
+                    else {
                         nextMove = NextMove.OPPONENT;
                     }
-                } else {
+                }
+                else {
                     boolean isHit = opponentShooting();
                     if (isHit) {
                         nextMove = NextMove.OPPONENT;
-                    } else {
+                    }
+                    else {
                         nextMove = NextMove.PLAYER;
                     }
                 }
             }
             if (playerMap.getScore() == 0) {
                 JOptionPane.showMessageDialog(null, "You lost!", "Game over", JOptionPane.ERROR_MESSAGE);
-            } else {
+            }
+            else {
                 String nickname = JOptionPane.showInputDialog(null, "Type your nickname to get to the high score list:", "You won!", JOptionPane.QUESTION_MESSAGE);
                 if (nickname != null) {
                     try {
@@ -186,11 +189,10 @@ public abstract class Game {
 
     /**
      * Wait for player's move
-     *
      * @return <b>true</b> if enemy ship has been hit, <b>false</b> otherwise
      */
     protected Boolean playerShooting() {
-        while (playerMoveQueue.isEmpty()) {
+        while(playerMoveQueue.isEmpty()) {
             //wait until player performs a move
         }
         return playerMoveQueue.remove().isAttacked();
@@ -198,10 +200,10 @@ public abstract class Game {
 
     /**
      * Wait for enemy's move
-     *
      * @return <b>true</b> if enemy hit player's ship, <b>false</b> otherwise
      */
     protected abstract Boolean opponentShooting();
+
 
     private class ClickObserver implements MapClickObserver {
 
@@ -212,9 +214,11 @@ public abstract class Game {
                 return;
             }
 
-            if (getState() != State.BATTLE
-                    && playerMap.isDeploymentFinished()
-                    && opponentMap.isDeploymentFinished()) {
+            if (
+                    getState() != State.BATTLE &&
+                            playerMap.isDeploymentFinished() &&
+                            opponentMap.isDeploymentFinished()
+                    ) {
                 setState(State.BATTLE);
             }
 
@@ -236,5 +240,7 @@ public abstract class Game {
             opponentMapView.showHitsOnMap();
             playerMapView.showShipsOnMap();
         }
-    }
+
+    };
+
 }

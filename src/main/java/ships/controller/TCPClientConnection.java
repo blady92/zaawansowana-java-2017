@@ -26,14 +26,4 @@ public class TCPClientConnection extends Connection {
         this.sock = socket;
     }
 
-    @Override
-    public void sendPacket(CommunicationPacket packet) throws IOException {
-        this.serializePacket(packet, sock.getOutputStream());
-    }
-
-    @Override
-    public CommunicationPacket receivePacket() throws IOException {
-        return this.deserializePacket(sock.getInputStream());
-    }
-
 }

@@ -5,24 +5,29 @@
  */
 package ships.controller;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 /**
  *
  * @author r4pt0r
  */
 public class TCPServerConnection extends Connection {
 
-    public TCPServerConnection(Integer port) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private ServerSocket srv;
+    private Socket sock;
+
+    public TCPServerConnection(Integer port) throws IOException {
+        srv = new ServerSocket(port);
+        //what thread are we in? same as gui?
+        sock = srv.accept();
     }
 
-    @Override
-    public void sendPacket(CommunicationPacket packet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public CommunicationPacket receivePacket() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public TCPServerConnection(ServerSocket server, Socket socket) {
+        super();
+        this.srv = server;
+        this.sock = socket;
     }
 
 }

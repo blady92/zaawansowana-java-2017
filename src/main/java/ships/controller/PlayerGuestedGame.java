@@ -23,10 +23,10 @@ public class PlayerGuestedGame extends Game {
 
     private Connection conn;
 
-    public PlayerGuestedGame() {
+    public PlayerGuestedGame(String ipAddress, Integer port) throws IOException {
         super();
 
-        throw new UnsupportedOperationException("Do we need it?");
+        conn = new TCPClientConnection(ipAddress, port);
     }
 
     public PlayerGuestedGame(
@@ -36,7 +36,6 @@ public class PlayerGuestedGame extends Game {
         super(playerMapView, opponentMapView);
 
         conn = new TCPClientConnection(ipAddress, port);
-        throw new UnsupportedOperationException("Wait for server's ship placement");
     }
 
     @Override
@@ -49,6 +48,7 @@ public class PlayerGuestedGame extends Game {
                 conn.sendPacket(packet);
             } catch (IOException ex) {
                 Logger.getLogger(PlayerGuestedGame.class.getName()).log(Level.SEVERE, null, ex);
+                this.setState(State.DEPLOYMENT);
             }
         }
     }
@@ -65,7 +65,7 @@ public class PlayerGuestedGame extends Game {
 
     @Override
     protected Boolean playerShooting() {
-        while (playerMoveQueue.isEmpty()) {
+        while(playerMoveQueue.isEmpty()) {
             //wait until player performs a move
         }
         Field f = playerMoveQueue.remove();

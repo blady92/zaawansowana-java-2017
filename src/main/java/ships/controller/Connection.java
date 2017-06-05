@@ -8,6 +8,8 @@ package ships.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
+
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -16,31 +18,35 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public abstract class Connection {
 
-    ObjectMapper mapper;
+    protected ObjectMapper mapper;
+    protected Socket sock;
 
     public Connection() {
         mapper = new ObjectMapper();
         //mapper.enableDefaultTyping();
     }
 
+
+
     /**
      * Send data through the connection
-     *
      * @param packet to send
      * @throws IOException
      */
-    abstract void sendPacket(CommunicationPacket packet) throws IOException;
+    public void sendPacket(CommunicationPacket packet) throws IOException {
+        this.serializePacket(packet, sock.getOutputStream());
+    }
 
     /**
      * Receive data from the connection
-     *
      * @return data packet
      */
-    abstract CommunicationPacket receivePacket() throws IOException;
+    public CommunicationPacket receivePacket() throws IOException {
+        return this.deserializePacket(sock.getInputStream());
+    }
 
     /**
      * Serialize packet to JSON and write to OutputStream
-     *
      * @param packet
      * @param os
      * @throws IOException
@@ -51,7 +57,6 @@ public abstract class Connection {
 
     /**
      * Deserialize packet from JSON in InputStream and return as packet class
-     *
      * @param is
      * @return
      * @throws IOException
