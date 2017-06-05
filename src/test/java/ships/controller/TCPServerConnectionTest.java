@@ -1,16 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ships.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,20 +26,23 @@ import ships.model.Ship;
  *
  * @author r4pt0r
  */
-public class TCPClientConnectionTest {
+public class TCPServerConnectionTest {
+
+    @Mock
+    ServerSocket srv;
 
     @Mock
     Socket sock;
 
     @InjectMocks
-    TCPClientConnection sut = new TCPClientConnection(sock);
+    TCPServerConnection sut = new TCPServerConnection(srv, sock);
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
-   /*@Test
+    /*@Test
     public void shouldSendAndReceiveMovePacket() throws IOException {
         //given
         Field f = new Field(1, 2);

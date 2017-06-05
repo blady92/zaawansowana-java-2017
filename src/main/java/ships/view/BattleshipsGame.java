@@ -14,7 +14,9 @@ import ships.model.Ship;
 import ships.model.SqliteDao;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -32,59 +34,81 @@ public class BattleshipsGame extends javax.swing.JFrame {
 
     /**
      * Creates new form GUI
-     *
-     * @throws ships.exception.ShipGameException
      */
     public BattleshipsGame() throws ShipGameException {
-        initComponents();
+        try {
+            initComponents();
 
-        //create game controller
-        String[] types = {"Player vs Computer", "Player vs Player (host)", "Player vs Player (guest)"};
-        String type = (String) JOptionPane.showInputDialog(
-                null,
-                "Choose game type",
-                "Game type",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                types,
-                types[0]
-        );
+            //create game controller
+            String[] types = {"Player vs Computer", "Player vs Player (host)", "Player vs Player (guest)"};
+            String type = (String) JOptionPane.showInputDialog(
+                    null,
+                    "Choose game type",
+                    "Game type",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    types,
+                    types[0]
+            );
 
-        if (type == null) {
-            System.exit(0);
+            if (type == null) {
+                System.exit(0);
+            }
+
+            switch(type) {
+                case "Player vs Computer":
+                    game = new PlayerVsComputerGame();
+                    break;
+                case "Player vs Player (host)":
+                    game = new PlayerHostedGame(6666);
+                    //wait for the client to connect
+                    JDialog dialog = new JDialog();
+                    dialog.setTitle("Connecting...");
+                    dialog.setBounds(new Rectangle(100, 100, 200, 30));
+                    dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+//                    Label label = new Label("Please wait until the client connects");
+//                    label.setBounds(new Rectangle(0, 0, 200, 30));
+//                    dialog.add(label);
+                    dialog.setVisible(true);
+                    while (game.getState() == Game.State.CONNECTING) {
+                        /**
+                         * this is not good method to wait for the connection
+                         * but temporarily it works
+                         */
+                    }
+                    dialog.setVisible(false);
+                    this.setTitle("Battleships: host at :6666");
+                    break;
+                case "Player vs Player (guest)":
+                    game = new PlayerGuestedGame("127.0.0.1", 6666);
+                    this.setTitle("Battleships: 127.0.0.1:6666");
+                    break;
+                default:
+                    /**
+                     * TODO:
+                     * dbunit
+                     */
+                    throw new RuntimeException("Unsupported game type");
+            }
+
+            //set sizes of components
+            game.getPlayerMapView().setBounds(0, 0, playerPanel.getWidth(), playerPanel.getHeight());
+            game.getOpponentMapView().setBounds(0, 0, opponentPanel.getWidth(), opponentPanel.getHeight());
+
+            //add components to panels
+            opponentPanel.add(game.getOpponentMapView());
+            playerPanel.add(game.getPlayerMapView());
+
+            //listen to click events to update non-gamefield interface
+            game.getPlayerMapView().addFieldSelectObserver(new PlayerObserver());
+
+            //listen to any change in map's state
+            game.getPlayerMap().addMapChangeObserver(new ChangeObserver());
+            game.getOpponentMap().addMapChangeObserver(new ChangeObserver());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Connection error","Error",JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(BattleshipsGame.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        switch (type) {
-            case "Player vs Computer":
-                game = new PlayerVsComputerGame();
-                break;
-            case "Player vs Player (host)":
-                game = new PlayerHostedGame();
-                break;
-            case "Player vs Player (guest)":
-                game = new PlayerGuestedGame();
-                break;
-            default:
-                /**
-                 * TODO: dbunit
-                 */
-                throw new RuntimeException("Unsupported game type");
-        }
-
-        //set sizes of components
-        game.getPlayerMapView().setBounds(0, 0, playerPanel.getWidth(), playerPanel.getHeight());
-        game.getOpponentMapView().setBounds(0, 0, opponentPanel.getWidth(), opponentPanel.getHeight());
-
-        //add components to panels
-        opponentPanel.add(game.getOpponentMapView());
-        playerPanel.add(game.getPlayerMapView());
-
-        //listen to click events to update non-gamefield interface
-        game.getPlayerMapView().addFieldSelectObserver(new PlayerObserver());
-
-        //listen to any change in map's state
-        game.getPlayerMap().addMapChangeObserver(new ChangeObserver());
-        game.getOpponentMap().addMapChangeObserver(new ChangeObserver());
     }
 
     /**
@@ -114,23 +138,23 @@ public class BattleshipsGame extends javax.swing.JFrame {
         javax.swing.GroupLayout playerPanelLayout = new javax.swing.GroupLayout(playerPanel);
         playerPanel.setLayout(playerPanelLayout);
         playerPanelLayout.setHorizontalGroup(
-            playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 280, Short.MAX_VALUE)
+                playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 280, Short.MAX_VALUE)
         );
         playerPanelLayout.setVerticalGroup(
-            playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 280, Short.MAX_VALUE)
+                playerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 280, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout opponentPanelLayout = new javax.swing.GroupLayout(opponentPanel);
         opponentPanel.setLayout(opponentPanelLayout);
         opponentPanelLayout.setHorizontalGroup(
-            opponentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 280, Short.MAX_VALUE)
+                opponentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 280, Short.MAX_VALUE)
         );
         opponentPanelLayout.setVerticalGroup(
-            opponentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 280, Short.MAX_VALUE)
+                opponentPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 280, Short.MAX_VALUE)
         );
 
         opponentScore.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
@@ -146,14 +170,14 @@ public class BattleshipsGame extends javax.swing.JFrame {
         javax.swing.GroupLayout panel1Layout = new javax.swing.GroupLayout(panel1);
         panel1.setLayout(panel1Layout);
         panel1Layout.setHorizontalGroup(
-            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE)
+                panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 17, Short.MAX_VALUE)
         );
         panel1Layout.setVerticalGroup(
-            panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel1Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel1))
+                panel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panel1Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jLabel1))
         );
 
         fourPicker.setIcon(new javax.swing.ImageIcon(getClass().getResource("/four.png"))); // NOI18N
@@ -206,60 +230,60 @@ public class BattleshipsGame extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(playerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(playerScore, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(opponentPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(fourPicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(threePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(twoPicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(onePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(opponentScore, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(213, 213, 213)
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(playerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(playerScore, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(panel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(opponentPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(fourPicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(threePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(twoPicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(onePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(opponentScore, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(213, 213, 213)
+                                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(fourPicker)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(threePicker)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(twoPicker)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(onePicker))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(opponentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(playerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(opponentScore)
-                                    .addComponent(jButton1)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(playerScore)
-                                .addGap(0, 0, Short.MAX_VALUE))))
-                    .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(fourPicker)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(threePicker)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(twoPicker)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(onePicker))
+                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                .addComponent(opponentPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(playerPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(0, 0, Short.MAX_VALUE)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(opponentScore)
+                                                                        .addComponent(jButton1)))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(playerScore)
+                                                                .addGap(0, 0, Short.MAX_VALUE))))
+                                        .addComponent(panel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         pack();
@@ -271,7 +295,8 @@ public class BattleshipsGame extends javax.swing.JFrame {
             twoPicker.setSelected(false);
             onePicker.setSelected(false);
             game.startPlacement(Ship.Size.FOUR);
-        } else {
+        }
+        else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_fourPickerItemStateChanged
@@ -282,7 +307,8 @@ public class BattleshipsGame extends javax.swing.JFrame {
             twoPicker.setSelected(false);
             onePicker.setSelected(false);
             game.startPlacement(Ship.Size.THREE);
-        } else {
+        }
+        else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_threePickerItemStateChanged
@@ -293,7 +319,8 @@ public class BattleshipsGame extends javax.swing.JFrame {
             threePicker.setSelected(false);
             onePicker.setSelected(false);
             game.startPlacement(Ship.Size.TWO);
-        } else {
+        }
+        else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_twoPickerItemStateChanged
@@ -304,7 +331,8 @@ public class BattleshipsGame extends javax.swing.JFrame {
             threePicker.setSelected(false);
             twoPicker.setSelected(false);
             game.startPlacement(Ship.Size.ONE);
-        } else {
+        }
+        else {
             game.stopPlacement();
         }
     }//GEN-LAST:event_onePickerItemStateChanged
@@ -315,12 +343,12 @@ public class BattleshipsGame extends javax.swing.JFrame {
             StringBuilder sb = new StringBuilder();
             SqliteDao dao = new SqliteDao();
             List<HighScore> scores = dao.getTopScores(10);
-            for (HighScore hs : scores) {
+            for(HighScore hs : scores) {
                 sb.append("<html><pre>").append(hs.getScore()).append("\t").append(hs.getNickname())/*.append("\n")*/;
             }
             JOptionPane.showMessageDialog(null, sb.toString(), "High Score", JOptionPane.INFORMATION_MESSAGE);
         } catch (ClassNotFoundException | SQLException ex) {
-            JOptionPane.showMessageDialog(null, "There was an error while contacting the server!", "Error!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "There was an error while contacting the server!","Error!", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(BattleshipsGame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -404,7 +432,6 @@ public class BattleshipsGame extends javax.swing.JFrame {
 
         /**
          * Updates picker label and tooltip, disable if necessary and deselects
-         *
          * @param picker
          * @param size
          */
@@ -418,8 +445,10 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 picker.setToolTipText("no more available");
                 return;
             }
-            picker.setToolTipText("" + availableShips + " more available");
+            picker.setToolTipText(""+availableShips+" more available");
         }
+
+
     }
 
     private class ChangeObserver implements MapChangeObserver {
@@ -431,5 +460,6 @@ public class BattleshipsGame extends javax.swing.JFrame {
                 opponentScore.setText(game.getOpponentScore().toString());
             }
         }
+
     }
 }
