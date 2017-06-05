@@ -53,7 +53,7 @@ public class PlayerHostedGame extends Game {
     ) throws ShipGameException, IOException {
         super(playerMapView, opponentMapView);
 
-        conn = new TCPServerConnection(port, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
+        conn = new TCPServerConnection(port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
     }
 
     @Override
@@ -87,3 +87,4 @@ public class PlayerHostedGame extends Game {
         throw new UnsupportedOperationException("TODO");
     }
 }
+

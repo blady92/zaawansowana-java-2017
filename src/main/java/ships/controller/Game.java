@@ -114,7 +114,7 @@ public abstract class Game {
         PLAYER, OPPONENT
     }
 
-    public State state = State.DEPLOYMENT;
+    public volatile State state = State.DEPLOYMENT;
     protected NextMove nextMove = NextMove.PLAYER;
 
     protected Map playerMap;

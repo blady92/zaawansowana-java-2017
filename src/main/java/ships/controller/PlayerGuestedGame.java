@@ -40,7 +40,7 @@ public class PlayerGuestedGame extends Game {
     ) throws ShipGameException, IOException {
         super(playerMapView, opponentMapView);
 
-        conn = new TCPClientConnection(ipAddress, port, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
+        conn = new TCPClientConnection(ipAddress, port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class PlayerGuestedGame extends Game {
             }
             Field f = playerMoveQueue.remove();
             opponentMap.shootAt(f);
+            playerMoveQueueForRemote.add(f);
             return f.isAttacked();
         } catch (OutsideOfMapPlacementException ex) {
             Logger.getLogger(PlayerGuestedGame.class.getName()).log(Level.SEVERE, null, ex);
@@ -72,4 +73,5 @@ public class PlayerGuestedGame extends Game {
         }
         throw new UnsupportedOperationException("TODO");
     }
+
 }
