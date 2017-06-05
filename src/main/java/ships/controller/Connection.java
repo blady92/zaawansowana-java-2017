@@ -5,6 +5,7 @@
  */
 package ships.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,13 +21,13 @@ public abstract class Connection {
 
     protected ObjectMapper mapper;
     protected Socket sock;
+    protected InputStream is;
+    protected OutputStream os;
 
     public Connection() {
         mapper = new ObjectMapper();
         //mapper.enableDefaultTyping();
     }
-
-
 
     /**
      * Send data through the connection
@@ -34,7 +35,7 @@ public abstract class Connection {
      * @throws IOException
      */
     public void sendPacket(CommunicationPacket packet) throws IOException {
-        this.serializePacket(packet, sock.getOutputStream());
+        this.serializePacket(packet, os);
     }
 
     /**
@@ -42,7 +43,7 @@ public abstract class Connection {
      * @return data packet
      */
     public CommunicationPacket receivePacket() throws IOException {
-        return this.deserializePacket(sock.getInputStream());
+        return this.deserializePacket(is);
     }
 
     /**
@@ -52,7 +53,9 @@ public abstract class Connection {
      * @throws IOException
      */
     protected void serializePacket(CommunicationPacket packet, OutputStream os) throws IOException {
-        mapper.writeValue(os, packet);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        mapper.writeValue(baos, packet);
+        os.write(baos.toByteArray());
     }
 
     /**
@@ -62,7 +65,20 @@ public abstract class Connection {
      * @throws IOException
      */
     protected CommunicationPacket deserializePacket(InputStream is) throws IOException {
-        return mapper.readValue(is, CommunicationPacket.class);
+        StringBuilder sb =new StringBuilder();
+        do {
+            byte[] buffer = new byte[is.available()];
+            if (is.available() == 0) {
+                continue;
+            }
+            int readCnt = is.read(buffer);
+            if (readCnt == 0) {
+                continue;
+            }
+            String str = new String(buffer, 0, readCnt);
+            sb.append(str);
+        }
+        while(!JSONUtils.checkValidity(sb.toString()));
+        return mapper.readValue(sb.toString(), CommunicationPacket.class);
     }
-
 }

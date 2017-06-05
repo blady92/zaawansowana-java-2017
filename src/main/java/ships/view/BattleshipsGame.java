@@ -77,9 +77,11 @@ public class BattleshipsGame extends javax.swing.JFrame {
                          */
                     }
                     dialog.setVisible(false);
+                    this.setTitle("Battleships: host at :6666");
                     break;
                 case "Player vs Player (guest)":
                     game = new PlayerGuestedGame("127.0.0.1", 6666);
+                    this.setTitle("Battleships: 127.0.0.1:6666");
                     break;
                 default:
                     /**

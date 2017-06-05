@@ -74,8 +74,13 @@ public abstract class Game {
         return opponentMap;
     }
 
-    public abstract void startPlacement(Ship.Size size);
-    public abstract void stopPlacement();
+    public void startPlacement(Ship.Size size) {
+        playerMapView.startPlacement(size);
+    }
+
+    public void stopPlacement() {
+        playerMapView.stopPlacement();
+    }
 
     /**
      * @param state the state to set
@@ -102,7 +107,7 @@ public abstract class Game {
     }
 
     public enum State {
-        CONNECTING, DEPLOYMENT, BATTLE
+        CONNECTING, DEPLOYMENT, WAITING, BATTLE
     }
 
     enum NextMove {
@@ -214,12 +219,18 @@ public abstract class Game {
                 return;
             }
 
+            if (state == State.DEPLOYMENT && playerMap.isDeploymentFinished()) {
+                setState(State.WAITING);
+                return;
+            }
+
             if (
                     getState() != State.BATTLE &&
                             playerMap.isDeploymentFinished() &&
                             opponentMap.isDeploymentFinished()
                     ) {
                 setState(State.BATTLE);
+                return;
             }
 
             if (nextMove == NextMove.PLAYER) {
@@ -240,7 +251,5 @@ public abstract class Game {
             opponentMapView.showHitsOnMap();
             playerMapView.showShipsOnMap();
         }
-
     };
-
 }

@@ -5,7 +5,9 @@
  */
 package ships.controller;
 
+import ships.exception.OutsideOfMapPlacementException;
 import ships.exception.ShipGameException;
+import ships.model.Field;
 import ships.model.Ship;
 import ships.view.OpponentMapView;
 import ships.view.PlayerMapView;
@@ -32,7 +34,7 @@ public class PlayerHostedGame extends Game {
             @Override
             public void run() {
                 try {
-                    conn = new TCPServerConnection(port);
+                    conn = new TCPServerConnection(port, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
                     setState(State.DEPLOYMENT);
                 } catch (IOException ex) {
                     Logger.getLogger(PlayerHostedGame.class.getName()).log(Level.SEVERE, null, ex);
@@ -48,45 +50,36 @@ public class PlayerHostedGame extends Game {
     ) throws ShipGameException, IOException {
         super(playerMapView, opponentMapView);
 
-        conn = new TCPServerConnection(port);
-    }
-
-    @Override
-    protected void setState(State state) {
-        super.setState(state);
-        if (state == State.BATTLE) {
-            List<Ship> ships = playerMap.getShips();
-            CommunicationPacket packet = new MapPacket(ships);
-            try {
-                conn.sendPacket(packet);
-            } catch (IOException ex) {
-                Logger.getLogger(PlayerGuestedGame.class.getName()).log(Level.SEVERE, null, ex);
-                this.setState(State.DEPLOYMENT);
-            }
-        }
-    }
-
-    @Override
-    public void startPlacement(Ship.Size size) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void stopPlacement() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        conn = new TCPServerConnection(port, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
     }
 
     @Override
     protected Boolean playerShooting() {
-        while(playerMoveQueue.isEmpty()) {
-            //wait until player performs a move
+        try {
+            while(playerMoveQueue.isEmpty()) {
+                //wait until player performs a move
+            }
+            Field f = playerMoveQueue.remove();
+            opponentMap.shootAt(f);
+            return f.isAttacked();
+        } catch (OutsideOfMapPlacementException ex) {
+            Logger.getLogger(PlayerGuestedGame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        throw new UnsupportedOperationException("TODO: send the move to client");
-        //return playerMoveQueue.remove();
+        throw new UnsupportedOperationException("TODO");
     }
 
     @Override
     protected Boolean opponentShooting() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            while (opponentMoveQueue.isEmpty()) {
+                //wait until remote player performs a move
+            }
+            Field f = opponentMoveQueue.remove();
+            playerMap.shootAt(f);
+            return f.isAttacked();
+        } catch (OutsideOfMapPlacementException ex) {
+            Logger.getLogger(PlayerGuestedGame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        throw new UnsupportedOperationException("TODO");
     }
 }
