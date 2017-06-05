@@ -32,6 +32,7 @@ public class PlayerHostedGame extends Game {
         super();
 
         this.state = State.CONNECTING;
+        this.nextMove = NextMove.PLAYER;
         Thread t = new Thread(new Runnable() {
 
             @Override
@@ -52,6 +53,7 @@ public class PlayerHostedGame extends Game {
             Integer port
     ) throws ShipGameException, IOException {
         super(playerMapView, opponentMapView);
+        this.nextMove = NextMove.PLAYER;
 
         conn = new TCPServerConnection(port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
     }
@@ -87,4 +89,3 @@ public class PlayerHostedGame extends Game {
         throw new UnsupportedOperationException("TODO");
     }
 }
-

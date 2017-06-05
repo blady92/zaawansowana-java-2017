@@ -29,8 +29,8 @@ public class TCPServerConnection extends Connection {
     private ServerSocket srv;
     private final Socket sock;
     private Thread connLoop;
-    private Queue<Field> playerMoveQueue;
-    private Queue<Field> opponentMoveQueue;
+    private volatile Queue<Field> playerMoveQueue;
+    private volatile Queue<Field> opponentMoveQueue;
     private Map playerMap;
     private Map opponentMap;
 
@@ -98,7 +98,7 @@ public class TCPServerConnection extends Connection {
                     packet = receivePacket();
                 } catch (IOException ex) {
                     Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
-                    return;
+                    continue;
                 }
                 if (packet instanceof MovePacket) {
                     opponentMoveQueue.add(((MovePacket)packet).getField());

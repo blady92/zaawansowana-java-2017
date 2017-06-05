@@ -30,6 +30,7 @@ public class PlayerGuestedGame extends Game {
 
     public PlayerGuestedGame(String ipAddress, Integer port) throws IOException {
         super();
+        this.nextMove = NextMove.PLAYER;
 
         conn = new TCPClientConnection(ipAddress, port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
     }
@@ -39,6 +40,7 @@ public class PlayerGuestedGame extends Game {
             String ipAddress, Integer port
     ) throws ShipGameException, IOException {
         super(playerMapView, opponentMapView);
+        this.nextMove = NextMove.PLAYER;
 
         conn = new TCPClientConnection(ipAddress, port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
     }

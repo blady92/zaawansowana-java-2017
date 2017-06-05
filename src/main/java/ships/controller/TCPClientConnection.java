@@ -27,8 +27,8 @@ public class TCPClientConnection extends Connection {
 
     private final Socket sock;
     private Thread connLoop;
-    private Queue<Field> playerMoveQueue;
-    private Queue<Field> opponentMoveQueue;
+    private volatile Queue<Field> playerMoveQueue;
+    private volatile Queue<Field> opponentMoveQueue;
     private Map playerMap;
     private Map opponentMap;
 
@@ -66,9 +66,9 @@ public class TCPClientConnection extends Connection {
 
         @Override
         public void run() {
-            while(sock.isConnected() && ! mapSent) {
+            while(sock.isConnected()) {
                 //check if we have something to send
-                if (playerMap.isDeploymentFinished()) {
+                if (playerMap.isDeploymentFinished() && ! mapSent) {
                     try {
                         sendPacket(new MapPacket(playerMap.getShips()));
                         mapSent = true;
@@ -97,7 +97,7 @@ public class TCPClientConnection extends Connection {
                     packet = receivePacket();
                 } catch (IOException ex) {
                     Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
-                    return;
+                    continue;
                 }
                 if (packet instanceof MovePacket) {
                     opponentMoveQueue.add(((MovePacket)packet).getField());
