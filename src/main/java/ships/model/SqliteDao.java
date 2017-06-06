@@ -1,6 +1,5 @@
 package ships.model;
 
-import javax.security.auth.Destroyable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.List;
 public class SqliteDao {
 
     Connection connection = null;
-    private final static String TABLE_NAME = "HighScores";
+    public final static String TABLE_NAME = "HighScores";
 
     public SqliteDao() throws ClassNotFoundException, SQLException {
         ResultSet resultSet = null;

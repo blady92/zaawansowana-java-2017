@@ -101,6 +101,7 @@ public class TCPClientConnectionTest {
     @Test
     public void shouldSendAndReceiveMovePacket() throws IOException {
         //given
+        when(sock.isConnected()).thenReturn(true);
         when(sock.getOutputStream()).thenReturn(os);
         when(sock.getInputStream()).thenReturn(is);
         TCPClientConnection sut = new TCPClientConnection(sock, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);

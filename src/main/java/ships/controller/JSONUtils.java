@@ -1,6 +1,6 @@
 package ships.controller;
 
-public class JSONUtils {
+public final class JSONUtils {
 
     private JSONUtils() {
     }

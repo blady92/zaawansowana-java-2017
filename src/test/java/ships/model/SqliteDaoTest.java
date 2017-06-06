@@ -11,11 +11,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.mockito.InjectMocks;
+
+import org.mockito.*;
+
 import static org.mockito.Matchers.any;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SqliteDaoTest {
@@ -36,6 +36,21 @@ public class SqliteDaoTest {
     public void setUp() throws SQLException {
         MockitoAnnotations.initMocks(this);
         this.sut = new SqliteDao(connection);
+    }
+
+    @Test
+    public void shouldAddNewScoreToDb() throws SQLException {
+        //given
+        String nickname = "testowy";
+        Integer score = 123;
+        when(connection.createStatement()).thenReturn(statement);
+        when(statement.execute((String) any())).thenReturn(true);
+        ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
+        //when
+        sut.addNewScore(nickname, score);
+        verify(statement).execute(sqlCaptor.capture());
+        //then
+        assertEquals("INSERT INTO "+SqliteDao.TABLE_NAME+" VALUES ('"+nickname+"',"+score+")", sqlCaptor.getValue());
     }
 
     @Test
