@@ -88,6 +88,7 @@ public class PlayerHostedGameTest {
         Field f = shootCaptor.getValue();
         Game.ClickObserver clickObserver = captor.getValue();
         clickObserver.fieldClickedEvent(new FieldSelectEventImpl(1, 2, FieldSelectEventImpl.BUTTON1), opponentMapView);
+        Thread.sleep(1000);
         //then
         assertEquals(new FieldImpl(1, 2), playerQueue.remove());
         assertEquals(new FieldImpl(2, 3), f);
