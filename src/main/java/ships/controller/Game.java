@@ -25,6 +25,18 @@ public abstract class Game {
         this.opponentMapView.addFieldSelectObserver(new ClickObserver());
     }
 
+    public Game(Map playerMap, Map opponentMap, PlayerMapView playerMapView, OpponentMapView opponentMapView) {
+        this.state = State.DEPLOYMENT;
+
+        this.playerMap = playerMap;
+        this.opponentMap = opponentMap;
+
+        this.playerMapView = playerMapView;
+        this.opponentMapView = opponentMapView;
+
+        this.opponentMapView.addFieldSelectObserver(new ClickObserver());
+    }
+
     public Game(PlayerMapView playerMapView, OpponentMapView opponentMapView) {
         this.state = State.DEPLOYMENT;
 
@@ -210,7 +222,7 @@ public abstract class Game {
     protected abstract Boolean opponentShooting();
 
 
-    private class ClickObserver implements MapClickObserver {
+    public class ClickObserver implements MapClickObserver {
 
         @Override
         public void fieldClickedEvent(FieldSelectEvent fce, MapView bm) {

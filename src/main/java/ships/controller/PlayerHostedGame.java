@@ -8,6 +8,7 @@ package ships.controller;
 import ships.exception.OutsideOfMapPlacementException;
 import ships.exception.ShipGameException;
 import ships.model.Field;
+import ships.model.Map;
 import ships.model.Ship;
 import ships.view.OpponentMapView;
 import ships.view.PlayerMapView;
@@ -56,6 +57,19 @@ public class PlayerHostedGame extends Game {
         this.nextMove = NextMove.PLAYER;
 
         conn = new TCPServerConnection(port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
+    }
+
+    public PlayerHostedGame(
+            Map playerMap, Map opponentMap,
+            PlayerMapView playerMapView, OpponentMapView opponentMapView,
+            TCPServerConnection clientConnection
+    ) throws ShipGameException, IOException {
+        super(playerMap, opponentMap, playerMapView, opponentMapView);
+        this.nextMove = NextMove.OPPONENT;
+
+        conn = clientConnection;
+        clientConnection.setPlayerMoveQueue(playerMoveQueueForRemote);
+        clientConnection.setOpponentMoveQueue(opponentMoveQueue);
     }
 
     @Override
