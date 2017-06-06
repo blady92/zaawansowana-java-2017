@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import org.mockito.*;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +45,7 @@ public class SqliteDaoTest {
         String nickname = "testowy";
         Integer score = 123;
         when(connection.createStatement()).thenReturn(statement);
-        when(statement.execute((String) any())).thenReturn(true);
+        when(statement.execute(anyString())).thenReturn(true);
         ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
         //when
         sut.addNewScore(nickname, score);
@@ -57,10 +58,10 @@ public class SqliteDaoTest {
     public void shouldReturnListOfHighScores() throws SQLException {
         //given
         when(connection.createStatement()).thenReturn(statement);
-        when(statement.executeQuery((String) any())).thenReturn(resultSet);
+        when(statement.executeQuery(any())).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true).thenReturn(false);
-        when(resultSet.getInt((String)any())).thenReturn(123);
-        when(resultSet.getString((String)any())).thenReturn("testowy");
+        when(resultSet.getInt(any())).thenReturn(123);
+        when(resultSet.getString(any())).thenReturn("testowy");
         //when
         sut.initializeTable();
         List<HighScore> scores = sut.getTopScores(10);

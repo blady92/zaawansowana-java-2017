@@ -53,14 +53,8 @@ public class PlayerGuestedGameTest {
     @Mock
     Map opponentMap;
 
-    /*@Mock
-    Socket sock;*/
-
     @Mock
     TCPClientConnection clientConnection;
-
-    /*@InjectMocks
-    PlayerGuestedGame sut = new PlayerGuestedGame(playerMapView, opponentMapView, "127.0.0.1", 1);*/
 
     @Test
     public void shouldPerformFewMovesOnAMap() throws ShipGameException, IOException, InterruptedException {

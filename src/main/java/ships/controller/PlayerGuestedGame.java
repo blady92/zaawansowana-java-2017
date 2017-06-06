@@ -29,6 +29,13 @@ public class PlayerGuestedGame extends Game {
     private Connection conn;
     protected volatile Queue<Field> playerMoveQueueForRemote = new ConcurrentLinkedQueue<>();
 
+    public PlayerGuestedGame(String ipAddress, Integer port) throws IOException {
+        super();
+        this.nextMove = NextMove.OPPONENT;
+
+        conn = new TCPClientConnection(ipAddress, port, playerMoveQueueForRemote, opponentMoveQueue, playerMap, opponentMap);
+    }
+
     public PlayerGuestedGame(
             PlayerMapView playerMapView, OpponentMapView opponentMapView,
             TCPClientConnection clientConnection

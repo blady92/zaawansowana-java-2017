@@ -5,34 +5,20 @@
  */
 package ships.controller;
 
-import ships.exception.CollidesWithAnotherShipException;
-import ships.exception.NoShipsAvailableException;
-import ships.exception.OutsideOfMapPlacementException;
-import ships.model.Map;
-import ships.model.Ship;
 import ships.model.Field;
+import ships.model.Map;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Queue;
 
 /**
  *
  * @author r4pt0r
  */
-public class TCPClientConnection extends Connection {
+public class TCPClientConnection extends TCPConnection {
 
-    private final Socket sock;
     private Thread connLoop;
-    protected volatile Queue<Field> playerMoveQueue;
-    protected volatile Queue<Field> opponentMoveQueue;
-    private Map playerMap;
-    private Map opponentMap;
-
-    private boolean mapSent = false;
 
     public TCPClientConnection(
             String ipAddress, Integer port,
@@ -90,64 +76,6 @@ public class TCPClientConnection extends Connection {
     public void setOpponentMoveQueue(Queue<Field> opponentMoveQueue) {
         if (opponentMoveQueue == null) {
             this.opponentMoveQueue = opponentMoveQueue;
-        }
-    }
-
-    private class ConnectionLoop implements Runnable {
-
-        @Override
-        public void run() {
-            while(sock.isConnected()) {
-                //check if we have something to send
-                if (playerMap.isDeploymentFinished() && ! mapSent) {
-                    try {
-                        sendPacket(new MapPacket(playerMap.getShips()));
-                        mapSent = true;
-                    } catch (IOException ex) {
-                        Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                if (!playerMoveQueue.isEmpty()) {
-                    try {
-                        sendPacket(new MovePacket(playerMoveQueue.remove()));
-                    } catch (IOException ex) {
-                        Logger.getLogger(TCPClientConnection.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                //receive
-                try {
-                    if (is.available() == 0) {
-                        //no data to read, skip
-                        continue;
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                CommunicationPacket packet;
-                try {
-                    packet = receivePacket();
-                } catch (IOException ex) {
-                    Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
-                    continue;
-                }
-                if (packet instanceof MovePacket) {
-                    opponentMoveQueue.add(((MovePacket)packet).getField());
-                }
-                else if (packet instanceof MapPacket && !opponentMap.isDeploymentFinished()) {
-                    List<Ship> ships = ((MapPacket)packet).getShips();
-                    for (Ship ship : ships) {
-                        try {
-                            opponentMap.placeShip(ship);
-                        } catch (CollidesWithAnotherShipException ex) {
-                            Logger.getLogger(TCPServerConnection.class.getName()).log(Level.INFO, null, ex);
-                        } catch (NoShipsAvailableException ex) {
-                            Logger.getLogger(TCPServerConnection.class.getName()).log(Level.INFO, null, ex);
-                        } catch (OutsideOfMapPlacementException ex) {
-                            Logger.getLogger(TCPServerConnection.class.getName()).log(Level.INFO, null, ex);
-                        }
-                    }
-                }
-            }
         }
     }
 }

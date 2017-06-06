@@ -5,31 +5,24 @@
  */
 package ships.controller;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
+import org.junit.*;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import ships.model.Field;
 import ships.model.FieldImpl;
 import ships.model.Map;
-import ships.model.Ship;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  *
@@ -75,29 +68,6 @@ public class TCPClientConnectionTest {
     @Mock
     OutputStream os;
 
-    /*@InjectMocks
-    TCPClientConnection sut = new TCPClientConnection(sock);
-
-    @Test
-    public void shouldSendAndReceiveMapPacket() throws IOException {
-        //given
-        List<Ship> ships = new ArrayList<>();
-        ships.add(new Ship(Ship.Size.FOUR, new Field(1, 2), Ship.Direction.VERTICAL));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteArrayInputStream bais;
-        when(sock.getOutputStream()).thenReturn(baos);
-        MapPacket packet = new MapPacket(ships);
-        //when
-        sut.sendPacket(packet);
-        String s = baos.toString();/////////////////////////////////////////////
-        bais = new ByteArrayInputStream(baos.toByteArray());
-        when(sock.getInputStream()).thenReturn(bais);
-        MapPacket received = (MapPacket) sut.receivePacket();
-        List<Ship> receivedShips = packet.getShips();
-        //then
-        assertEquals(ships, receivedShips);
-    }*/
-
     @Test
     public void shouldSendAndReceiveMovePacket() throws IOException {
         //given
@@ -106,19 +76,10 @@ public class TCPClientConnectionTest {
         when(sock.getInputStream()).thenReturn(is);
         TCPClientConnection sut = new TCPClientConnection(sock, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
         ArgumentCaptor<byte[]> outCaptor = ArgumentCaptor.forClass(byte[].class);
-        ArgumentCaptor<byte[]> inCaptor = ArgumentCaptor.forClass(byte[].class);
         //when
         sut.sendPacket(new MovePacket(new FieldImpl(1, 2)));
         verify(os).write(outCaptor.capture());
         byte[] outBuf = outCaptor.getValue();
-        /*when(is.read((byte[]) any())).thenReturn(outBuf.length);
-        CommunicationPacket packet = sut.receivePacket();
-        verify(is).read(inCaptor.capture());
-        byte[] inBuf = inCaptor.getValue();
-        if (inBuf.length > outBuf.length) {
-            System.arraycopy(outBuf, 0, inBuf, 0, outBuf.length);
-        }*/
-
         //then
         assertTrue(JSONUtils.checkValidity(new String(outBuf)));
     }
