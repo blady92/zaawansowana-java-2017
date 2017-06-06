@@ -54,12 +54,25 @@ public class TCPClientConnection extends Connection {
         connLoop.start();
     }
 
-    public TCPClientConnection(Socket socket) {
+    public TCPClientConnection(
+            Socket socket,
+            Queue<Field> playerMoveQueue, final Queue<Field> opponentMoveQueue,
+            Map playerMap, final Map opponentMap
+    ) throws IOException {
         super();
         this.sock = socket;
-        throw new UnsupportedOperationException("mock player queues and map");
-        //connLoop = new Thread(new ConnectionLoop());
-        //connLoop.start();
+
+        this.playerMoveQueue = playerMoveQueue;
+        this.opponentMoveQueue = opponentMoveQueue;
+
+        this.playerMap = playerMap;
+        this.opponentMap = opponentMap;
+
+        is = sock.getInputStream();
+        os = sock.getOutputStream();
+
+        connLoop = new Thread(new ConnectionLoop());
+        connLoop.start();
     }
 
     private class ConnectionLoop implements Runnable {

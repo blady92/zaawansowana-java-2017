@@ -57,10 +57,31 @@ public class TCPServerConnection extends Connection {
         connLoop.start();
     }
 
-    public TCPServerConnection(ServerSocket server, Socket socket) {
+    public TCPServerConnection(
+            ServerSocket server, Socket socket,
+            Queue<Field> playerMoveQueue, final Queue<Field> opponentMoveQueue,
+            Map playerMap, final Map opponentMap
+    ) {
         super();
+
         this.srv = server;
         this.sock = socket;
+
+        this.playerMoveQueue = playerMoveQueue;
+        this.opponentMoveQueue = opponentMoveQueue;
+
+        this.playerMap = playerMap;
+        this.opponentMap = opponentMap;
+
+        try {
+
+            is = sock.getInputStream();
+            os = sock.getOutputStream();
+            connLoop = new Thread(new ConnectionLoop());
+            connLoop.start();
+        } catch (IOException ex) {
+            Logger.getLogger(TCPServerConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private class ConnectionLoop implements Runnable {

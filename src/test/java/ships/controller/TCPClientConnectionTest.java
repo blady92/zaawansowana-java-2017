@@ -5,24 +5,30 @@
  */
 package ships.controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import ships.model.Field;
 import ships.model.FieldImpl;
+import ships.model.Map;
 import ships.model.Ship;
 
 /**
@@ -31,35 +37,46 @@ import ships.model.Ship;
  */
 public class TCPClientConnectionTest {
 
-    @Mock
-    Socket sock;
+    public TCPClientConnectionTest() {
+    }
 
-    @InjectMocks
-    TCPClientConnection sut = new TCPClientConnection(sock);
+    @BeforeClass
+    public static void setUpClass() {
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+    }
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
 
-   /*@Test
-    public void shouldSendAndReceiveMovePacket() throws IOException {
-        //given
-        Field f = new Field(1, 2);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteArrayInputStream bais;
-        when(sock.getOutputStream()).thenReturn(baos);
-        MovePacket mp = new MovePacket(new Field(1, 2));
-        //when
-        sut.sendPacket(mp);
-        String s = baos.toString();/////////////////////////////////////////////
-        bais = new ByteArrayInputStream(baos.toByteArray());
-        when(sock.getInputStream()).thenReturn(bais);
-        MovePacket packet = (MovePacket) sut.receivePacket();
-        Field receivedField = packet.getField();
-        //then
-        assertEquals(f, receivedField);
+    @After
+    public void tearDown() {
     }
+
+    Queue<Field> playerMoveQueue = new ConcurrentLinkedQueue<>();
+    Queue<Field> opponentMoveQueue = new ConcurrentLinkedQueue<>();
+
+    @Mock
+    Socket sock;
+
+    @Mock
+    Map playerMap;
+
+    @Mock
+    Map opponentMap;
+
+    @Mock
+    InputStream is;
+
+    @Mock
+    OutputStream os;
+
+    /*@InjectMocks
+    TCPClientConnection sut = new TCPClientConnection(sock);
 
     @Test
     public void shouldSendAndReceiveMapPacket() throws IOException {
@@ -80,5 +97,29 @@ public class TCPClientConnectionTest {
         //then
         assertEquals(ships, receivedShips);
     }*/
+
+    @Test
+    public void shouldSendAndReceiveMovePacket() throws IOException {
+        //given
+        when(sock.getOutputStream()).thenReturn(os);
+        when(sock.getInputStream()).thenReturn(is);
+        TCPClientConnection sut = new TCPClientConnection(sock, playerMoveQueue, opponentMoveQueue, playerMap, opponentMap);
+        ArgumentCaptor<byte[]> outCaptor = ArgumentCaptor.forClass(byte[].class);
+        ArgumentCaptor<byte[]> inCaptor = ArgumentCaptor.forClass(byte[].class);
+        //when
+        sut.sendPacket(new MovePacket(new FieldImpl(1, 2)));
+        verify(os).write(outCaptor.capture());
+        byte[] outBuf = outCaptor.getValue();
+        /*when(is.read((byte[]) any())).thenReturn(outBuf.length);
+        CommunicationPacket packet = sut.receivePacket();
+        verify(is).read(inCaptor.capture());
+        byte[] inBuf = inCaptor.getValue();
+        if (inBuf.length > outBuf.length) {
+            System.arraycopy(outBuf, 0, inBuf, 0, outBuf.length);
+        }*/
+
+        //then
+        assertTrue(JSONUtils.checkValidity(new String(outBuf)));
+    }
 
 }
