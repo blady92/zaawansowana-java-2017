@@ -13,6 +13,18 @@ import java.util.logging.Logger;
 
 public abstract class Game {
 
+    public Game() {
+        this.state = State.DEPLOYMENT;
+
+        this.playerMap = new GameMap();
+        this.opponentMap = new GameMap();
+
+        this.playerMapView = new PlayerMapView(playerMap);
+        this.opponentMapView = new OpponentMapView(opponentMap);
+
+        this.opponentMapView.addFieldSelectObserver(new ClickObserver());
+    }
+
     public Game(Map playerMap, Map opponentMap, PlayerMapView playerMapView, OpponentMapView opponentMapView) {
         this.state = State.DEPLOYMENT;
 

@@ -84,6 +84,24 @@ public class TCPServerConnection extends Connection {
         }
     }
 
+    /**
+     * @param playerMoveQueue the playerMoveQueue to set
+     */
+    public void setPlayerMoveQueue(Queue<Field> playerMoveQueue) {
+        if (this.playerMoveQueue == null) {
+            this.playerMoveQueue = playerMoveQueue;
+        }
+    }
+
+    /**
+     * @param opponentMoveQueue the opponentMoveQueue to set
+     */
+    public void setOpponentMoveQueue(Queue<Field> opponentMoveQueue) {
+        if (opponentMoveQueue == null) {
+            this.opponentMoveQueue = opponentMoveQueue;
+        }
+    }
+
     private class ConnectionLoop implements Runnable {
 
         @Override
