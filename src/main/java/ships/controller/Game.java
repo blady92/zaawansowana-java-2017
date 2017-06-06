@@ -13,14 +13,14 @@ import java.util.logging.Logger;
 
 public abstract class Game {
 
-    public Game() {
+    public Game(Map playerMap, Map opponentMap, PlayerMapView playerMapView, OpponentMapView opponentMapView) {
         this.state = State.DEPLOYMENT;
 
-        this.playerMap = new GameMap();
-        this.opponentMap = new GameMap();
+        this.playerMap = playerMap;
+        this.opponentMap = opponentMap;
 
-        this.playerMapView = new PlayerMapView(playerMap);
-        this.opponentMapView = new OpponentMapView(opponentMap);
+        this.playerMapView = playerMapView;
+        this.opponentMapView = opponentMapView;
 
         this.opponentMapView.addFieldSelectObserver(new ClickObserver());
     }
@@ -210,7 +210,7 @@ public abstract class Game {
     protected abstract Boolean opponentShooting();
 
 
-    private class ClickObserver implements MapClickObserver {
+    public class ClickObserver implements MapClickObserver {
 
         @Override
         public void fieldClickedEvent(FieldSelectEvent fce, MapView bm) {
